@@ -8,9 +8,7 @@ export const metadata = {
 export default function Page() {
   return (
     <div>
-    <Link href="/.">Dashboard</Link>
-    <Link href="/settings">Settings</Link>
-    <Link href="/[username]" as="/blakeminix">Profile</Link>
+
     </div>
   );
 }
