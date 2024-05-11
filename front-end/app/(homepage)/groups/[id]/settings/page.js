@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import LoggedIn from '@/app/components/LoggedIn';
+import LogOut from '@/app/components/LogOut';
 
 export const metadata = {
   title: "Group Settings | CMS",
@@ -14,6 +15,7 @@ export default function Page() {
         <Link href="/.">Dashboard</Link>
         <Link href="/[username]" as="/blakeminix">Profile</Link>
         <Link href="/settings">Settings</Link>
+        <LogOut />
       </div>
     </div>
   );
