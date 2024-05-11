@@ -1,3 +1,4 @@
+import LoggedIn from '@/app/components/LoggedIn';
 import Link from 'next/link'
 
 export const metadata = {
@@ -8,7 +9,12 @@ export const metadata = {
 export default function Page() {
   return (
     <div>
-
+      <LoggedIn />
+      <div className="top-bar">
+        <Link href="/.">Dashboard</Link>
+        <Link href="/[username]" as="/blakeminix">Profile</Link>
+        <Link href="/settings">Settings</Link>
+      </div>
     </div>
   );
 }

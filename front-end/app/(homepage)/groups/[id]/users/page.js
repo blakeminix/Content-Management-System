@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import LoggedIn from '@/app/components/LoggedIn';
 
 export const metadata = {
   title: "Users | CMS",
@@ -8,7 +9,12 @@ export const metadata = {
 export default function Page() {
   return (
     <div>
-      
+      <LoggedIn />
+      <div className="top-bar">
+        <Link href="/.">Dashboard</Link>
+        <Link href="/[username]" as="/blakeminix">Profile</Link>
+        <Link href="/settings">Settings</Link>
+      </div>
     </div>
   );
 }
