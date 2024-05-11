@@ -1,7 +1,6 @@
 import Link from 'next/link'
-import "../globals.css"
-import LoggedIn from '../components/LoggedIn';
-import LogOut from '../components/LogOut';
+import "../../globals.css"
+import { redirect } from 'next/navigation';
 
 export const metadata = {
   title: "Dashboard | CMS",
@@ -9,10 +8,11 @@ export const metadata = {
 };
  
 export default function Page() {
+
+  redirect('/dashboard');
     
   return (
     <div>
-      <LoggedIn />
     </div>
   );
 }

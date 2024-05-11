@@ -21,7 +21,7 @@ export default function Login() {
       if (username === 'admin' && password === 'password') {
         // Redirect to dashboard if authentication succeeds
         dispatch(logIn(username));
-        router.push('/');
+        router.push('/login/redirect-to-dashboard');
       } else {
         // Show error message or handle unsuccessful login
         console.error('Invalid credentials');

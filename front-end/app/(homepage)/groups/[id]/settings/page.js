@@ -12,7 +12,7 @@ export default function Page() {
     <div>
       <LoggedIn />
       <div className="top-bar">
-        <Link href="/.">Dashboard</Link>
+        <Link href="/dashboard">Dashboard</Link>
         <Link href="/[username]" as="/blakeminix">Profile</Link>
         <Link href="/settings">Settings</Link>
         <LogOut />
