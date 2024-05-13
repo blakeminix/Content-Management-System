@@ -1,19 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { v4 } from "uuid";
+import { updateSession } from "./app/lib";
 
-
-export function middleware(req) {
-
-    const response = NextResponse.next();
-
-    if (!req.cookies.has('uid')) {
-        response.cookies.set('uid', v4());
-    }
-
-    return response;
+export async function middleware(request) {
+  return await updateSession(request);
 }
-/*
-export const config = {
-    matcher: '/'
-}
-*/
