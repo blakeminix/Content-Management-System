@@ -14,7 +14,6 @@ export default async function Page() {
         action={async (formData) => {
           "use server";
           await login(formData);
-          redirect("/.");
         }}
       >
         <input type="text" name="username" placeholder="Username" />

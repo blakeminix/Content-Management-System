@@ -4,13 +4,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { redirect } from "next/navigation";
 import { v4 } from "uuid";
 
-// use environment variable as secretKey
+// use environment variable for secretKey
 const secretKey = "secret";
 const key = new TextEncoder().encode(secretKey);
 
 export async function encrypt(payload) {
 
-  const expiresIn = 10 * 1000000000;
+  const expiresIn = 30 * 24 * 60 * 60 * 1000;
   const expirationTime = Date.now() + expiresIn;
 
   return await new SignJWT(payload)
@@ -29,17 +29,22 @@ export async function decrypt(input) {
 
 export async function login(formData) {
 
+  const name = formData.get("username");
+  const password = formData.get("password");
+
   // Verify credentials && get the user
-  const user = { username: formData.get("username"), sid: v4() };
+  const user = { username: name, sid: v4() };
 
-  // Create the session
-  const expires = new Date(Date.now() + 10 * 1000000000);
-  const session = await encrypt({ user, expires });
+  if (name == "admin" && password == "password") {
+    // Create the session
+    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    const session = await encrypt({ user, expires });
 
-  // Save the session in a cookie
-  if (formData.get("username") == "admin" && formData.get("password") == "password") {
+    // Save the session in a cookie
     cookies().set("session", session, { expires, httpOnly: true });
     redirect('/dashboard');
+  } else {
+    redirect('/.');
   }
 }
 
@@ -56,16 +61,16 @@ export async function getSession() {
 
 export async function signup(formData) {
 
-  // Verify credentials && get the user
+  // Check if username is not taken, add user to database
   const user = { username: formData.get("username"), sid: v4() };
 
   // Create the session
-  const expires = new Date(Date.now() + 10 * 1000000000);
+  const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
   const session = await encrypt({ user, expires });
 
   // Save the session in a cookie
   cookies().set("session", session, { expires, httpOnly: true });
-  //redirect('/dashboard');
+  redirect('/dashboard');
 }
 
 export async function updateSession(request) {
@@ -74,7 +79,7 @@ export async function updateSession(request) {
 
   // Refresh the session so it doesn't expire
   const parsed = await decrypt(session);
-  parsed.expires = new Date(Date.now() + 10 * 1000000000);
+  parsed.expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
   const res = NextResponse.next();
   res.cookies.set({
     name: "session",
