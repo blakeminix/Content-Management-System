@@ -57,7 +57,7 @@ export async function getSession() {
 export async function signup(formData) {
 
   // Verify credentials && get the user
-  const user = { username: formData.get("username") };
+  const user = { username: formData.get("username"), sid: v4() };
 
   // Create the session
   const expires = new Date(Date.now() + 10 * 1000000000);

@@ -1,6 +1,6 @@
-import './/globals.css'
+import '../../globals.css'
 import { redirect } from "next/navigation";
-import { getSession, login, logout } from './/lib.js';
+import { getSession, login, logout, signup } from '../../lib';
 
 export default async function Page() {
   const session = await getSession();
@@ -13,7 +13,7 @@ export default async function Page() {
       <form
         action={async (formData) => {
           "use server";
-          await login(formData);
+          await signup(formData);
           redirect("/.");
         }}
       >
@@ -21,19 +21,8 @@ export default async function Page() {
         <br />
         <input type="text" name="password" placeholder="Password" />
         <br />
-        <button type="submit">Login</button>
-      </form>
-
-      <form
-        action={async () => {
-          "use server";
-          await logout();
-          redirect("/signup");
-        }}
-        >
         <button type="submit">Sign Up</button>
-        </form>
-
+      </form>
     </section>
   );
 }
