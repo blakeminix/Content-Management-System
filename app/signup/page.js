@@ -1,6 +1,6 @@
-import '../../globals.css'
+import '../globals.css'
 import { redirect } from "next/navigation";
-import { getSession, login, logout, signup } from '../../lib';
+import { getSession, login, logout, signup } from '../lib';
 
 export default async function Page() {
   const session = await getSession();
@@ -14,7 +14,6 @@ export default async function Page() {
         action={async (formData) => {
           "use server";
           await signup(formData);
-          redirect("/.");
         }}
       >
         <input type="text" name="username" placeholder="Username" />
