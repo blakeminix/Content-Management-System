@@ -79,7 +79,7 @@ export async function signup(formData) {
 
   await pool.query('INSERT INTO users (username, password) VALUES (?, ?)', [name, password]);
 
-  const user = { username: formData.get("username"), sid: v4() };
+  const user = { username: name, sid: v4() };
 
   // Create the session
   const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
@@ -88,6 +88,18 @@ export async function signup(formData) {
   // Save the session in a cookie
   cookies().set("session", session, { expires, httpOnly: true });
   redirect('/dashboard');
+}
+
+export async function deleteAccount() {
+  const session = cookies().get("session")?.value;
+  if (!session) return;
+
+  const parsed = await decrypt(session);
+  const username = parsed.user.username;
+
+  await pool.query('DELETE FROM users WHERE username = ?', [username]);
+
+  cookies().set("session", "", { expires: new Date(0) });
 }
 
 export async function updateSession(request) {
