@@ -5,8 +5,18 @@ import { redirect } from "next/navigation";
 import { v4 } from "uuid";
 
 // use environment variable for secretKey
-const secretKey = "secret";
+const secretKey = process.env.SECRET_KEY;
 const key = new TextEncoder().encode(secretKey);
+
+const mysql = require('mysql2/promise');
+
+const pool = mysql.createPool({
+  host: 'localhost',
+  port: '3307',
+  user: process.env.USER,
+  password: process.env.PASSWORD,
+  database: process.env.DATABASE
+});
 
 export async function encrypt(payload) {
 
@@ -35,7 +45,10 @@ export async function login(formData) {
   // Verify credentials && get the user
   const user = { username: name, sid: v4() };
 
-  if (name == "admin" && password == "password") {
+  const [rows] = await pool.query('SELECT * FROM users WHERE username = ? AND password = ?', [name, password]);
+  const valid = rows[0];
+
+  if (valid) {
     // Create the session
     const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
     const session = await encrypt({ user, expires });
@@ -61,7 +74,11 @@ export async function getSession() {
 
 export async function signup(formData) {
 
-  // Check if username is not taken, add user to database
+  const name = formData.get("username");
+  const password = formData.get("password");
+
+  await pool.query('INSERT INTO users (username, password) VALUES (?, ?)', [name, password]);
+
   const user = { username: formData.get("username"), sid: v4() };
 
   // Create the session
