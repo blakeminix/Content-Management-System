@@ -16,9 +16,9 @@ export default async function Page() {
           await login(formData);
         }}
       >
-        <input type="text" name="username" placeholder="Username" />
+        <input type="username" name="username" placeholder="Username" />
         <br />
-        <input type="text" name="password" placeholder="Password" />
+        <input type="password" name="password" placeholder="Password" />
         <br />
         <button type="submit">Login</button>
       </form>

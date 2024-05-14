@@ -10,18 +10,31 @@ export default async function Page() {
   // <pre>{JSON.stringify(session, null, 2)}</pre>
   return (
     <section>
+
       <form
         action={async (formData) => {
           "use server";
           await signup(formData);
         }}
       >
-        <input type="text" name="username" placeholder="Username" />
+        <input type="username" name="username" placeholder="Username" />
         <br />
-        <input type="text" name="password" placeholder="Password" />
+        <input type="password" name="password" placeholder="Password" />
+        <br />
+        <input type="password" name="repeatPassword" placeholder="Repeat Password" />
         <br />
         <button type="submit">Sign Up</button>
       </form>
+
+      <form
+        action={async (formData) => {
+          "use server";
+          redirect('/.');
+        }}
+      >
+        <button type="submit">Back to Login</button>
+      </form>
+
     </section>
   );
 }
