@@ -18,6 +18,19 @@ const pool = mysql.createPool({
   database: process.env.DATABASE
 });
 
+const bcrypt = require('bcryptjs');
+
+// Function to hash a password
+async function hashPassword(password) {
+  const saltRounds = 10;
+  return await bcrypt.hash(password, saltRounds);
+}
+
+// Function to verify a password
+async function verifyPassword(password, hashedPassword) {
+  return await bcrypt.compare(password, hashedPassword);
+}
+
 export async function encrypt(payload) {
 
   const expiresIn = 30 * 24 * 60 * 60 * 1000;
@@ -42,13 +55,19 @@ export async function login(formData) {
   const name = formData.get("username");
   const password = formData.get("password");
 
-  // Verify credentials && get the user
-  const user = { username: name, sid: v4() };
+  const [row] = await pool.query('SELECT password FROM users WHERE username = ?', [name]);
+  const storedPassword = row[0]?.password;
 
-  const [rows] = await pool.query('SELECT * FROM users WHERE username = ? AND password = ?', [name, password]);
-  const valid = rows[0];
+  let passwordMatch = false;
 
-  if (valid) {
+  if (password != null && storedPassword != null) {
+    passwordMatch = await verifyPassword(password, storedPassword);
+  }
+
+
+  if (passwordMatch) {
+    const user = { username: name, sid: v4() };
+
     // Create the session
     const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
     const session = await encrypt({ user, expires });
@@ -77,7 +96,9 @@ export async function signup(formData) {
   const name = formData.get("username");
   const password = formData.get("password");
 
-  await pool.query('INSERT INTO users (username, password) VALUES (?, ?)', [name, password]);
+  const hashedPassword = await hashPassword(password);
+
+  await pool.query('INSERT INTO users (username, password) VALUES (?, ?)', [name, hashedPassword]);
 
   const user = { username: name, sid: v4() };
 
