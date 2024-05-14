@@ -72,6 +72,7 @@ export async function login(formData) {
     cookies().set("session", session, { expires, httpOnly: true });
     redirect('/dashboard');
   } else {
+    console.log('Incorrect Password');
     redirect('/.');
   }
 }
@@ -90,20 +91,34 @@ export async function getSession() {
 export async function signup(formData) {
   const name = formData.get("username");
   const password = formData.get("password");
+  const repeatPassword = formData.get('repeatPassword');
 
-  const hashedPassword = await hashPassword(password);
+  const [row] = await pool.query('SELECT username FROM users WHERE username = ?', [name]);
+  const storedUsername = row[0]?.username;
 
-  await pool.query('INSERT INTO users (username, password) VALUES (?, ?)', [name, hashedPassword]);
+  if (storedUsername != name) {
+    if (password == repeatPassword && name != null && password != null && repeatPassword != null && name.length >= 3 && password.length >= 5) {
+      const hashedPassword = await hashPassword(password);
 
-  const user = { username: name, sid: v4() };
+      await pool.query('INSERT INTO users (username, password) VALUES (?, ?)', [name, hashedPassword]);
 
-  // Create the session
-  const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-  const session = await encrypt({ user, expires });
+      const user = { username: name, sid: v4() };
 
-  // Save the session in a cookie
-  cookies().set("session", session, { expires, httpOnly: true });
-  redirect('/dashboard');
+      // Create the session
+      const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      const session = await encrypt({ user, expires });
+
+      // Save the session in a cookie
+      cookies().set("session", session, { expires, httpOnly: true });
+      redirect('/dashboard');
+    } else {
+      console.log('Invalid Password or Username')
+      redirect('/signup');
+    }
+  } else {
+    console.log('Username Taken');
+    redirect('/signup');
+  }
 }
 
 export async function deleteAccount() {
