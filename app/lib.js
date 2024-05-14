@@ -4,11 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { redirect } from "next/navigation";
 import { v4 } from "uuid";
 
+const mysql = require('mysql2/promise');
+const bcrypt = require('bcryptjs');
+
 // use environment variable for secretKey
 const secretKey = process.env.SECRET_KEY;
 const key = new TextEncoder().encode(secretKey);
-
-const mysql = require('mysql2/promise');
 
 const pool = mysql.createPool({
   host: 'localhost',
@@ -17,8 +18,6 @@ const pool = mysql.createPool({
   password: process.env.PASSWORD,
   database: process.env.DATABASE
 });
-
-const bcrypt = require('bcryptjs');
 
 // Function to hash a password
 async function hashPassword(password) {
@@ -32,7 +31,6 @@ async function verifyPassword(password, hashedPassword) {
 }
 
 export async function encrypt(payload) {
-
   const expiresIn = 30 * 24 * 60 * 60 * 1000;
   const expirationTime = Date.now() + expiresIn;
 
@@ -51,7 +49,6 @@ export async function decrypt(input) {
 }
 
 export async function login(formData) {
-
   const name = formData.get("username");
   const password = formData.get("password");
 
@@ -63,7 +60,6 @@ export async function login(formData) {
   if (password != null && storedPassword != null) {
     passwordMatch = await verifyPassword(password, storedPassword);
   }
-
 
   if (passwordMatch) {
     const user = { username: name, sid: v4() };
@@ -92,7 +88,6 @@ export async function getSession() {
 }
 
 export async function signup(formData) {
-
   const name = formData.get("username");
   const password = formData.get("password");
 
