@@ -9,7 +9,8 @@ export default async function Page() {
   }
   // <pre>{JSON.stringify(session, null, 2)}</pre>
   return (
-    <section>
+    <section className='centered'>
+      <div>
       <form
         action={async (formData) => {
           "use server";
@@ -32,7 +33,7 @@ export default async function Page() {
         >
         <button type="submit">Sign Up</button>
         </form>
-
+      </div>
     </section>
   );
 }

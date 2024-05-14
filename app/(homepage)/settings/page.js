@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { logout, getSession } from '../../lib'
+import { logout, getSession, deleteAccount } from '../../lib'
 import { redirect } from 'next/navigation';
 
 export const metadata = {
@@ -18,7 +18,6 @@ export default async function Page() {
   return (
     <div>
       <div className="top-bar">
-      <div className="top-bar">
         <Link href="/dashboard">Dashboard</Link>
         <Link href="/[username]" as="/blakeminix">Profile</Link>
         <Link href="/settings">Settings</Link>
@@ -31,8 +30,23 @@ export default async function Page() {
         >
         <button type="submit">Logout</button>
         </form>
+
+        <button className="prof"></button>
+
       </div>
-      </div>
+
+      <form
+        action={async () => {
+          "use server";
+          await deleteAccount();
+          redirect("/login");
+        }}
+        >
+          <div className='group-row'>
+            <button type="submit">Delete Account</button>
+          </div>
+        </form>
+
     </div>
   );
 }

@@ -32,15 +32,7 @@ export default async function Page() {
         <button type="submit">Logout</button>
         </form>
 
-        <form
-        action={async () => {
-          "use server";
-          await deleteAccount();
-          redirect("/login");
-        }}
-        >
-        <button type="submit">Delete Account</button>
-        </form>
+        <button className="prof"></button>
 
       </div>
       <div className="group-row">
