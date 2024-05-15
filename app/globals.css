@@ -191,7 +191,7 @@ a {
   width: 250px;
   border-radius: 7px;
   border: 1px solid white;
-  padding: 0 5px;
+  padding: 0 8px;
   background-color: black;
 }
 
@@ -211,7 +211,7 @@ a {
 
 .login-button {
   width: 250px;
-  height: 35px;
+  height: 40px;
   background-color: black;
   border-radius: 7px;
 }

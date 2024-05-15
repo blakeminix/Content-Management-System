@@ -97,7 +97,7 @@ export async function signup(formData) {
   const storedUsername = row[0]?.username;
 
   if (storedUsername != name) {
-    if (password == repeatPassword && name != null && password != null && repeatPassword != null && name.length >= 3 && password.length >= 5) {
+    if (password == repeatPassword && name != null && password != null && repeatPassword != null && name.length >= 3 && password.length >= 5 && name.length && name.length <= 30 && password.length <= 44) {
       const hashedPassword = await hashPassword(password);
 
       await pool.query('INSERT INTO users (username, password) VALUES (?, ?)', [name, hashedPassword]);

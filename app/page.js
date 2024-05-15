@@ -17,10 +17,10 @@ export default async function Page() {
           await login(formData);
         }}
       >
-        <input className="text-box" type="username" name="username" placeholder="Username" />
+        <input className="text-box" type="username" name="username" placeholder="Username" maxLength={30}/>
         <br />
         <br />
-        <input className="text-box" type="password" name="password" placeholder="Password" />
+        <input className="text-box" type="password" name="password" placeholder="Password" maxLength={44}/>
         <br />
         <br />
         <div className='border-line'></div>

@@ -28,7 +28,7 @@ export default async function Page() {
           redirect("/.");
         }}
         >
-        <button type="submit">Logout</button>
+        <button className="logout-button" type="submit">Logout</button>
         </form>
         <ProfileDropdown />
       </div>

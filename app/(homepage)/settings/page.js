@@ -43,7 +43,7 @@ export default async function Page() {
         }}
         >
           <div className='group-row'>
-            <button type="submit">Delete Account</button>
+            <button className="login-button" type="submit">Delete Account</button>
           </div>
         </form>
 
