@@ -32,6 +32,14 @@ export function ProfileDropdown() {
     }    
 */
 
+function handleProfile() {
+  router.push("/users/admin");
+}
+
+function handleSettings() {
+  router.push('/settings');
+}
+
 const handleLogout = async () => {
   console.log("handlelogout");
   try {
@@ -58,9 +66,9 @@ const handleLogout = async () => {
     <div>
       <button className="prof" onClick={toggleDropdown}></button>
       <div className="dropdown-content" id="dropdown-content">
-        <Link href="/[username]" as="/blakeminix">My Profile</Link>
-        <Link href="/settings">Settings</Link>
-        <button className="logout-button" onClick={handleLogout}>Logout</button>
+        <button className="dropdown-button" onClick={handleProfile}>Profile</button>
+        <button className="dropdown-button" onClick={handleSettings}>Settings</button>
+        <button className="dropdown-button" onClick={handleLogout}>Logout</button>
       </div>
     </div>
   );

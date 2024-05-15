@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { logout, getSession } from '../../lib';
+import { logout, getSession } from '../../../lib';
 import { redirect } from 'next/navigation';
 import { ProfileDropdown } from '@/app/components/ProfileDropdown';
 
@@ -15,7 +15,7 @@ export default async function Page() {
   if (session == null) {
     redirect('/.');
   }
-    
+
   return (
     <div>
       <div className="top-bar">
