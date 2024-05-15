@@ -7,7 +7,7 @@ import { v4 } from "uuid";
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 
-// use environment variable for secretKey
+// Use environment variable for secretKey
 const secretKey = process.env.SECRET_KEY;
 const key = new TextEncoder().encode(secretKey);
 
