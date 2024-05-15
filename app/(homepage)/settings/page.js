@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { logout, getSession, deleteAccount } from '../../lib'
 import { redirect } from 'next/navigation';
+import { ProfileDropdown } from '@/app/components/ProfileDropdown';
 
 export const metadata = {
   title: "Settings | CMS",
@@ -19,20 +20,17 @@ export default async function Page() {
     <div>
       <div className="top-bar">
         <Link href="/dashboard">Dashboard</Link>
-        <Link href="/[username]" as="/blakeminix">Profile</Link>
-        <Link href="/settings">Settings</Link>
+  
         <form
         action={async () => {
           "use server";
           await logout();
-          redirect("/login");
+          redirect("/.");
         }}
         >
-        <button type="submit">Logout</button>
+        <button className="logout-button" type="submit">Logout</button>
         </form>
-
-        <button className="prof"></button>
-
+        <ProfileDropdown />
       </div>
 
       <form
