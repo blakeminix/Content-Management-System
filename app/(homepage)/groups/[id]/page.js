@@ -33,8 +33,6 @@ export default async function Page() {
         <ProfileDropdown />
       </div>
         <div className='group-row'>
-          <Link href="/groups/[id]/users" as="/groups/1/users">Users</Link>
-          <Link href="/groups/[id]/settings" as="/groups/1/settings">Settings</Link>
         </div>
     </div>
   );
