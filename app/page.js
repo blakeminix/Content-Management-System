@@ -17,11 +17,15 @@ export default async function Page() {
           await login(formData);
         }}
       >
-        <input type="username" name="username" placeholder="Username" />
+        <input className="text-box" type="username" name="username" placeholder="Username" />
         <br />
-        <input type="password" name="password" placeholder="Password" />
         <br />
-        <button type="submit">Login</button>
+        <input className="text-box" type="password" name="password" placeholder="Password" />
+        <br />
+        <br />
+        <div className='border-line'></div>
+        <br />
+        <button className="login-button" type="submit">Login</button>
       </form>
 
       <form
@@ -31,7 +35,8 @@ export default async function Page() {
           redirect("/signup");
         }}
         >
-        <button type="submit">Sign Up</button>
+        <br />
+        <button className="login-button" type="submit">Don't have an account? Sign Up</button>
         </form>
       </div>
     </section>

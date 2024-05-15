@@ -13,6 +13,36 @@ export function ProfileDropdown() {
         dropdown.classList.toggle("show");
     }
 
+    window.onclick = function(event) {
+        if (!event.target.matches('.prof')) {
+          const dropdowns = document.getElementsByClassName("dropdown-content");
+          for (let i = 0; i < dropdowns.length; i++) {
+            const dropdown = dropdowns[i];
+            if (dropdown.classList.contains('show')) {
+              dropdown.classList.remove('show');
+            }
+          }
+        }
+      }    
+
+    const handleLogout = async () => {
+        try {
+          const response = await fetch('../api/route', {
+            method: 'POST',
+          });
+          if (response.ok) {
+            console.log('Successful');
+            // Logout successful, perform any necessary actions (e.g., redirect)
+          } else {
+            // Handle error response
+            console.error('Logout failed:', response.statusText);
+          }
+        } catch (error) {
+          console.error('Logout error:', error);
+          // Handle fetch error
+        }
+      };
+
     return (
         <div>
         <button className="prof" onClick={toggleDropdown}></button>
@@ -20,7 +50,7 @@ export function ProfileDropdown() {
             <Link href="/[username]" as="/blakeminix">Profile</Link>
             <Link href="/settings">Settings</Link>
             <a>Dark Mode</a>
-            <button type="submit">Logout</button>
+            <button className="logout-button" onClick={handleLogout}>Logout</button>
         </div>
         </div>
     );

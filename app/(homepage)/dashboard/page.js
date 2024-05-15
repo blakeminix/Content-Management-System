@@ -15,7 +15,7 @@ export default async function Page() {
   if (session == null) {
     redirect('/.');
   }
-    
+
   return (
     <div>
       <div className="top-bar">
