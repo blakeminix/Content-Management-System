@@ -5,7 +5,7 @@ import { ProfileDropdown } from '@/app/components/ProfileDropdown';
 
 export const metadata = {
   title: "Group | CMS",
-  description: "A content management system developed using React/Next.js for the front-end, Express.js/Node.js for the back-end, and MySQL for the back-end database.",
+  description: "A content management system developed using React for the front-end, Next.js as a full-stack framework, and MySQL as the back-end database.",
 };
  
 export default async function Page() {
@@ -19,22 +19,10 @@ export default async function Page() {
   return (
     <div>
       <div className="top-bar">
-        <Link href="/dashboard">Dashboard</Link>
-  
-        <form
-        action={async () => {
-          "use server";
-          await logout();
-          redirect("/.");
-        }}
-        >
-        <button className="logout-button" type="submit">Logout</button>
-        </form>
+        <Link className="dash-link" href="/dashboard">Dashboard</Link>
         <ProfileDropdown />
       </div>
         <div className='group-row'>
-          <Link href="/groups/[id]/users" as="/groups/1/users">Users</Link>
-          <Link href="/groups/[id]/settings" as="/groups/1/settings">Settings</Link>
         </div>
     </div>
   );

@@ -137,10 +137,11 @@ a {
   padding: 8px;
   z-index: 1000;
   border: 1px solid white;
+  flex-direction: column;
 }
 
 .dropdown-content.show {
-  display: block;
+  display: flex;
 }
 
 .dropdown-content a {
@@ -160,6 +161,11 @@ a {
 
 .dropdown-link {
   color: black;
+}
+
+.dash-link {
+  position: absolute;
+  left: 25px;
 }
 
 .group-row {
@@ -225,7 +231,7 @@ a {
   background-color: #333;
 }
 
-.logout-button {
+.dropdown-button {
   width: 195px;
   height: 35px;
   background-color: rgb(23, 23, 23);
@@ -233,7 +239,7 @@ a {
   border-radius: 7px;
 }
 
-.logout-button:hover {
+.dropdown-button:hover {
   background-color: #333;
   cursor: pointer;
   border: 1px solid white;

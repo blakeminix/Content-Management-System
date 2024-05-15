@@ -19,17 +19,7 @@ export default async function Page() {
   return (
     <div>
       <div className="top-bar">
-        <Link href="/dashboard">Dashboard</Link>
-  
-        <form
-        action={async () => {
-          "use server";
-          await logout();
-          redirect("/.");
-        }}
-        >
-        <button className="logout-button" type="submit">Logout</button>
-        </form>
+        <Link className="dash-link" href="/dashboard">Dashboard</Link>
         <ProfileDropdown />
       </div>
       <div className="group-row">
