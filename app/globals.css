@@ -162,6 +162,11 @@ a {
   color: black;
 }
 
+.dash-link {
+  position: absolute;
+  left: 25px;
+}
+
 .group-row {
   display: flex;
   align-items: center;

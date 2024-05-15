@@ -19,7 +19,7 @@ export default async function Page() {
   return (
     <div>
       <div className="top-bar">
-        <Link href="/dashboard">Dashboard</Link>
+        <Link className="dash-link" href="/dashboard">Dashboard</Link>
         <ProfileDropdown />
       </div>
       <div className="group-row">
