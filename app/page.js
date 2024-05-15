@@ -2,6 +2,12 @@ import './/globals.css'
 import { redirect } from "next/navigation";
 import { getSession, login, logout } from './/lib.js';
 
+export const metadata = {
+  title: "Login | CMS",
+  description: "A content management system developed using React for the front-end, Next.js as a full-stack framework, and MySQL as the back-end database.",
+};
+ 
+
 export default async function Page() {
   const session = await getSession();
   if (session != null) {

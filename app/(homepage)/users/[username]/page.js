@@ -4,8 +4,8 @@ import { redirect } from 'next/navigation';
 import { ProfileDropdown } from '@/app/components/ProfileDropdown';
 
 export const metadata = {
-  title: "blakeminix | CMS",
-  description: "A content management system developed using React/Next.js for the front-end, Express.js/Node.js for the back-end, and MySQL for the back-end database.",
+  title: "Profile | CMS",
+  description: "A content management system developed using React for the front-end, Next.js as a full-stack framework, and MySQL as the back-end database.",
 };
  
 export default async function Page() {
