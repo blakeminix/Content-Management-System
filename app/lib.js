@@ -12,7 +12,7 @@ const secretKey = process.env.SECRET_KEY;
 const key = new TextEncoder().encode(secretKey);
 
 const pool = mysql.createPool({
-  host: 'localhost',
+  host: process.env.HOST,
   port: '3307',
   user: process.env.USER,
   password: process.env.PASSWORD,

@@ -2,6 +2,7 @@ import "../../globals.css"
 import Link from 'next/link'
 import { deleteAccount, getSession, logout } from '@/app/lib';
 import { redirect } from 'next/navigation';
+import { ProfileDropdown } from '../../components/ProfileDropdown'
 
 export const metadata = {
   title: "Dashboard | CMS",
@@ -19,21 +20,17 @@ export default async function Page() {
     <div>
       <div className="top-bar">
         <Link href="/dashboard">Dashboard</Link>
-        <Link href="/[username]" as="/blakeminix">Profile</Link>
-        <Link href="/settings">Settings</Link>
-
+  
         <form
         action={async () => {
           "use server";
           await logout();
-          redirect("/login");
+          redirect("/.");
         }}
         >
         <button type="submit">Logout</button>
         </form>
-
-        <button className="prof"></button>
-
+        <ProfileDropdown />
       </div>
       <div className="group-row">
         <Link href="/groups/[id]" as="/groups/1">Group 1</Link>

@@ -103,13 +103,13 @@ a {
 .top-bar {
   display: flex;
   align-items: center;
-  height: 55px;
-  border-bottom: 1px solid white;
-  top: 0;
+  height: 60px;
   position: fixed;
+  top: 0;
   width: 100%;
   z-index: 999;
-  background-color: black;
+  background-color: #333;
+  color: #fff;
 }
 
 .prof {
@@ -118,7 +118,8 @@ a {
   background-color: white;
   border-radius: 50%;
   position: fixed;
-  right: 50px;
+  right: 45px;
+  top: 10px;
 }
 
 .prof:hover {
@@ -127,28 +128,45 @@ a {
 
 .dropdown-content {
   display: none;
-  position: fixed;
-  top: 55px; /* Adjust this value to position the dropdown below the top bar */
-  right: 50px;
-  background-color: white;
+  position: absolute;
+  top: calc(100% + -8px);
+  right: 45px;
+  background-color: rgb(23, 23, 23);
   border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   padding: 8px;
-  z-index: 1000; /* Ensure dropdown appears above other content */
+  z-index: 1000;
+  border: 1px solid white;
 }
 
 .dropdown-content.show {
   display: block;
 }
 
+.dropdown-content a {
+  display: block;
+  padding: 8px 16px;
+  color: white;
+  text-decoration: none;
+}
+
+.dropdown-content a:hover {
+  background-color: #333;
+}
+
 .top-bar a {
   margin: 0 50px;
+}
+
+.dropdown-link {
+  color: black;
 }
 
 .group-row {
   display: flex;
   align-items: center;
   height: 55px;
-  margin-top: 55px;
+  margin-top: 65px;
 }
 
 .group-row a {
