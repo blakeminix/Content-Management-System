@@ -27,7 +27,7 @@ export default async function Page() {
         action={async () => {
           "use server";
           await deleteAccount();
-          redirect("/login");
+          redirect("/.");
         }}
         >
           <div className='group-row'>

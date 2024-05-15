@@ -18,7 +18,7 @@ export function ProfileDropdown() {
 
     // Must use useEffect + useState to resolve window is not defined error. Functionality works, but error appears.
     // Will also want to add fading animation to the dropdown.
-    /*
+    
     window.onclick = function(event) {
       if (!event.target.matches('.prof')) {
         const dropdowns = document.getElementsByClassName("dropdown-content");
@@ -30,7 +30,7 @@ export function ProfileDropdown() {
         }
       }
     }    
-*/
+
 
 function handleProfile() {
   router.push("/users/admin");
