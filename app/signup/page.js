@@ -9,21 +9,26 @@ export default async function Page() {
   }
   // <pre>{JSON.stringify(session, null, 2)}</pre>
   return (
-    <section>
-
+    <section className='centered'>
+      <div>
       <form
         action={async (formData) => {
           "use server";
           await signup(formData);
         }}
       >
-        <input type="username" name="username" placeholder="Username" />
+        <input className="text-box" type="username" name="username" placeholder="Username" maxLength={30}/>
         <br />
-        <input type="password" name="password" placeholder="Password" />
         <br />
-        <input type="password" name="repeatPassword" placeholder="Repeat Password" />
+        <input className="text-box" type="password" name="password" placeholder="Password" maxLength={44}/>
         <br />
-        <button type="submit">Sign Up</button>
+        <br />
+        <input className="text-box" type="password" name="repeatPassword" placeholder="Repeat Password" maxLength={44}/>
+        <br />
+        <br />
+        <div className='border-line'></div>
+        <br />
+        <button className="login-button" type="submit">Sign Up</button>
       </form>
 
       <form
@@ -32,9 +37,10 @@ export default async function Page() {
           redirect('/.');
         }}
       >
-        <button type="submit">Back to Login</button>
+        <br />
+        <button className="login-button" type="submit">Back to Login</button>
       </form>
-
+      </div>
     </section>
   );
 }
