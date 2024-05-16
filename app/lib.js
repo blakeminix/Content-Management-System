@@ -133,6 +133,15 @@ export async function deleteAccount() {
   cookies().set("session", "", { expires: new Date(0) });
 }
 
+export async function getUsername() {
+  const session = cookies().get("session")?.value;
+  if (!session) return;
+
+  const parsed = await decrypt(session);
+  const username = parsed.user.username;
+  return username;
+}
+
 export async function updateSession(request) {
   const session = request.cookies.get("session")?.value;
   if (!session) return;
