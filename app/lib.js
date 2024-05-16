@@ -121,6 +121,35 @@ export async function signup(formData) {
   }
 }
 
+export async function createGroup(formData) {
+  const session = cookies().get("session")?.value;
+  if (!session) return;
+
+  const parsed = await decrypt(session);
+  const username = parsed.user.username;
+
+  const group_name = formData.get("group_name");
+
+  const users = `["${username}"]`;
+  const is_public = formData.get("is_public");
+  let is_request_to_join = false;
+
+  if (is_public == false) {
+    is_request_to_join = true;
+  }
+
+  const created_at = Date.now();
+  const updated_at = Date.now();
+  const uniqueid = v4();
+
+  await pool.query('INSERT INTO groups (group_name, users_in_group, moderators, owner_username, is_request_to_join, is_public, created_at, updated_at, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', group_name, users, users, username, is_request_to_join, is_public, created_at, updated_at, uniqueid);
+
+  const [row] = await pool.query('SELECT id FROM users WHERE uuid = ?', [uniqueid]);
+  const storedID = row[0]?.id;
+
+  return storedID;
+}
+
 export async function deleteAccount() {
   const session = cookies().get("session")?.value;
   if (!session) return;
