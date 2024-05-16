@@ -147,6 +147,8 @@ export async function createGroup(formData) {
   const [row] = await pool.query('SELECT id FROM users WHERE uuid = ?', [uniqueid]);
   const storedID = row[0]?.id;
 
+  await pool.query('UPDATE users SET groups = JSON_ARRAY_APPEND(groups, "$", ?) WHERE username = ?', [storedID, username]);
+
   return storedID;
 }
 
