@@ -8,6 +8,27 @@ import { useRouter } from "next/navigation";
 export function ProfileDropdown() {
   const router = useRouter();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [username, setUsername] = useState('');
+
+  const getUsername = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/getusername', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Get username failed');
+      }
+
+      const data = await response.json();
+      setUsername(data.message);
+    } catch (error) {
+      console.error('Get username failed:', error);
+    }
+  }
 
   function toggleDropdown() {
     const dropdown = document.getElementById("dropdown-content");
@@ -28,8 +49,12 @@ export function ProfileDropdown() {
     }
   }, []);
 
+  useEffect(() => {
+    getUsername();
+  }, []);
+
   function handleProfile() {
-    router.push("/users/admin");
+    router.push(`/users/${username}`);
   }
 
   function handleSettings() {
@@ -37,7 +62,6 @@ export function ProfileDropdown() {
   }
 
   const handleLogout = async () => {
-    console.log("handlelogout");
     try {
       const response = await fetch('http://localhost:3000/api/logout', {
         method: 'POST',
