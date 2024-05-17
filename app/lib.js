@@ -130,7 +130,8 @@ export async function createGroup(formData) {
 
   const group_name = formData.get("group_name");
 
-  const users = `["${username}"]`;
+  let users = [];
+  users.push(username);
 
   let is_public = false;
   let is_request_to_join = false;
@@ -142,7 +143,7 @@ export async function createGroup(formData) {
   }
   const uniqueid = v4();
 
-  await pool.query('INSERT INTO `groups` (group_name, users_in_group, moderators, owner_username, is_request_to_join, is_public, uuid) VALUES (?, ?, ?, ?, ?, ?, ?)', [group_name, users, users, username, is_request_to_join, is_public, uniqueid]);
+  await pool.query('INSERT INTO `groups` (group_name, users_in_group, moderators, owner_username, is_request_to_join, is_public, uuid) VALUES (?, ?, ?, ?, ?, ?, ?)', [group_name, JSON.stringify(users), JSON.stringify(users), username, is_request_to_join, is_public, uniqueid]);
 
   const [row] = await pool.query('SELECT id FROM `groups` WHERE uuid = ?', [uniqueid]);
   const storedID = row[0]?.id;
@@ -158,6 +159,21 @@ export async function createGroup(formData) {
   await pool.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), username]);
 
   return storedID;
+}
+
+export async function deleteGroup(gid) {
+  const [groupRow] = await pool.query('SELECT JSON_EXTRACT(users_in_group, "$[*]") AS users_in_group FROM `groups` WHERE id = ?', [gid]);
+  const usersArray = groupRow[0].users_in_group;
+
+  for (const username of usersArray) {
+    const [userRow] = await pool.query('SELECT `groups` FROM users WHERE username = ?', [username]);
+    let userGroups = userRow[0].groups;
+    let newArray = userGroups.filter(id => id != gid);
+
+    await pool.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(newArray), username]);
+  }
+
+  await pool.query('DELETE FROM `groups` WHERE id = ?', [gid]);
 }
 
 export async function deleteAccount() {
