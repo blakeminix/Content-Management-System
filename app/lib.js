@@ -131,23 +131,31 @@ export async function createGroup(formData) {
   const group_name = formData.get("group_name");
 
   const users = `["${username}"]`;
-  const is_public = formData.get("is_public");
+
+  let is_public = false;
   let is_request_to_join = false;
 
-  if (is_public == false) {
+  if (formData.get("is_public") == "public") {
+    is_public = true;
+  } else {
     is_request_to_join = true;
   }
-
-  const created_at = Date.now();
-  const updated_at = Date.now();
   const uniqueid = v4();
 
-  await pool.query('INSERT INTO groups (group_name, users_in_group, moderators, owner_username, is_request_to_join, is_public, created_at, updated_at, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', group_name, users, users, username, is_request_to_join, is_public, created_at, updated_at, uniqueid);
+  await pool.query('INSERT INTO `groups` (group_name, users_in_group, moderators, owner_username, is_request_to_join, is_public, uuid) VALUES (?, ?, ?, ?, ?, ?, ?)', [group_name, users, users, username, is_request_to_join, is_public, uniqueid]);
 
-  const [row] = await pool.query('SELECT id FROM users WHERE uuid = ?', [uniqueid]);
+  const [row] = await pool.query('SELECT id FROM `groups` WHERE uuid = ?', [uniqueid]);
   const storedID = row[0]?.id;
 
-  await pool.query('UPDATE users SET groups = JSON_ARRAY_APPEND(groups, "$", ?) WHERE username = ?', [storedID, username]);
+  const [userRow] = await pool.query('SELECT `groups` FROM users WHERE username = ?', [username]);
+  let userGroups = userRow[0]?.groups;
+
+  if (!userGroups) {
+    userGroups = [];
+  }
+
+  userGroups.push(storedID);
+  await pool.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), username]);
 
   return storedID;
 }
