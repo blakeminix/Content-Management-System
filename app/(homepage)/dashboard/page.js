@@ -1,9 +1,8 @@
 import "../../globals.css"
 import Link from 'next/link'
-import { deleteAccount, getGroups, getSession, logout } from '@/app/lib';
+import { deleteAccount, getUserGroups, getSession, logout } from '@/app/lib';
 import { redirect } from 'next/navigation';
 import { ProfileDropdown } from '../../components/ProfileDropdown'
-import { Refresh } from "@/app/components/Refresh";
 
 export const metadata = {
   title: "Dashboard | CMS",
@@ -17,8 +16,7 @@ export default async function Page() {
     redirect('/.');
   }
 
-  const groups = await getGroups();
-  console.log(groups);
+  const groups = await getUserGroups();
 
   return (
     <div>
@@ -30,8 +28,8 @@ export default async function Page() {
       <div className="group-row">
         {groups && groups.length > 0 ? (
           groups.map(group => (
-            <Link key={group} href={`/groups/${group}`}>
-              {group}
+            <Link key={group.id} href={`/groups/${group.id}`}>
+              {group.group_name}
             </Link>
           ))
         ) : (
