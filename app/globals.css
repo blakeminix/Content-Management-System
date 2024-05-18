@@ -110,6 +110,7 @@ a {
   z-index: 999;
   background-color: #333;
   color: #fff;
+  padding: 10px 0px;
 }
 
 .prof {
@@ -156,7 +157,7 @@ a {
 }
 
 .top-bar a {
-  margin: 0 50px;
+  padding-left: 40px;
 }
 
 .dropdown-link {
@@ -266,6 +267,28 @@ a {
   background-color: #333;
   cursor: pointer;
   border: 1px solid white;
+}
+
+.side-bar {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 150px;
+  height: calc(100% - 60px);
+  background-color: #333;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.side-bar a {
+  color: #fff;
+  text-decoration: none;
+  padding-bottom: 30px;
+  padding-left: 20px;
+}
+
+.side-bar a:hover {
 }
 
 .focus {

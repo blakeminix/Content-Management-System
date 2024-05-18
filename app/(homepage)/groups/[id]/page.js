@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { ProfileDropdown } from '@/app/components/ProfileDropdown';
 import { headers } from "next/headers";
 import { DeleteGroup } from '@/app/components/DeleteGroupButton';
+import { SideBar } from '@/app/components/SideBar'
 
 export const metadata = {
   title: "Group | CMS",
@@ -25,8 +26,7 @@ export default async function Page() {
         <Link href="/creategroup">Create Group</Link>
         <ProfileDropdown />
       </div>
-
-      <DeleteGroup />
+      <SideBar />
     </div>
   );
 }
