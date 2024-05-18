@@ -220,6 +220,7 @@ a {
   height: 40px;
   background-color: black;
   border-radius: 7px;
+  border: 1px solid white;
 }
 
 .login-button:hover {
