@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { deleteAccount, getGroups, getSession, logout } from '@/app/lib';
 import { redirect } from 'next/navigation';
 import { ProfileDropdown } from '../../components/ProfileDropdown'
+import { Refresh } from "@/app/components/Refresh";
 
 export const metadata = {
   title: "Dashboard | CMS",
@@ -27,11 +28,15 @@ export default async function Page() {
         <ProfileDropdown />
       </div>
       <div className="group-row">
-        {groups.map(group => (
-          <Link key={group} href={`/groups/${group}`}>
-            {group}
-          </Link>
-        ))}
+        {groups && groups.length > 0 ? (
+          groups.map(group => (
+            <Link key={group} href={`/groups/${group}`}>
+              {group}
+            </Link>
+          ))
+        ) : (
+          <p>No groups</p>
+        )}
       </div>
     </div>
   );

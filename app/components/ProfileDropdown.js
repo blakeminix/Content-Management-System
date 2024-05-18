@@ -49,6 +49,7 @@ export function ProfileDropdown() {
         }
       }
     }
+    router.refresh();
   }, []);
 
   useEffect(() => {
