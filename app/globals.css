@@ -172,12 +172,11 @@ a {
   display: inline-block;
   padding: 15px;
   margin: 10px;
-  background-color: #87CEEB;;
-  border: 1px solid #ccc;
+  background-color: #6bb7d8;
   border-radius: 8px;
   text-align: center;
   text-decoration: none;
-  color: #000;  /* Ensure the text color is applied */
+  color: #000;
   font-weight: bold;
   transition: background-color 0.3s ease, transform 0.3s ease;
   width: 290px;
@@ -185,7 +184,7 @@ a {
 }
 
 .group-link:hover {
-  background-color: #6bb7d8;;
+  background-color: #87CEEB;
   transform: scale(1.03);
 }
 
