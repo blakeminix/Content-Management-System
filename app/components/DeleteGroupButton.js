@@ -1,14 +1,15 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import '../globals.css'
 import { useRouter } from "next/navigation";
-import { usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation';
 
 export function DeleteGroup() {
   const router = useRouter();
   const [username, setUsername] = useState('');
   const pathname = usePathname()
+  const startTransition = useTransition();
 
   const handleDeleteGroup = async () => {
     const parts = pathname.split("/");
@@ -28,6 +29,7 @@ export function DeleteGroup() {
     } catch (error) {
       console.error('Logout failed:', error);
     }
+    router.refresh();
     router.push('/dashboard');
   };
 

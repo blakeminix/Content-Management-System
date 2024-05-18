@@ -1,6 +1,6 @@
 import "../../globals.css"
 import Link from 'next/link'
-import { deleteAccount, getGroups, getSession, logout } from '@/app/lib';
+import { deleteAccount, getUserGroups, getSession, logout } from '@/app/lib';
 import { redirect } from 'next/navigation';
 import { ProfileDropdown } from '../../components/ProfileDropdown'
 
@@ -16,8 +16,7 @@ export default async function Page() {
     redirect('/.');
   }
 
-  const groups = await getGroups();
-  console.log(groups);
+  const groups = await getUserGroups();
 
   return (
     <div>
@@ -27,11 +26,17 @@ export default async function Page() {
         <ProfileDropdown />
       </div>
       <div className="group-row">
-        {groups.map(group => (
-          <Link key={group} href={`/groups/${group}`}>
-            {group}
-          </Link>
-        ))}
+        {groups && groups.length > 0 ? (
+          groups.map(group => (
+            <Link className="group-link" key={group.id} href={`/groups/${group.id}`}>
+                <div>{group.group_name}</div>
+                <br />
+                <div>#{group.id}</div>
+            </Link>
+          ))
+        ) : (
+          <p></p>
+        )}
       </div>
     </div>
   );
