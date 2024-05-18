@@ -176,6 +176,18 @@ export async function deleteGroup(gid) {
   await pool.query('DELETE FROM `groups` WHERE id = ?', [gid]);
 }
 
+export async function getGroups() {
+  const session = cookies().get("session")?.value;
+  if (!session) return;
+
+  const parsed = await decrypt(session);
+  const username = parsed.user.username;
+
+  const [groupRow] = await pool.query('SELECT JSON_EXTRACT(`groups`, "$[*]") AS `groups` FROM users WHERE username = ?', [username])
+  const groups = groupRow[0].groups;
+  return groups;
+}
+
 export async function deleteAccount() {
   const session = cookies().get("session")?.value;
   if (!session) return;

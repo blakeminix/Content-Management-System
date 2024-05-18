@@ -1,6 +1,6 @@
-import '../../globals.css'
+import '../globals.css'
 import { redirect } from "next/navigation";
-import { getSession, login, logout, signup, createGroup } from '../../lib';
+import { getSession, login, logout, signup, createGroup } from '../lib';
 import { ProfileDropdown } from '@/app/components/ProfileDropdown';
 import Link from 'next/link';
 
