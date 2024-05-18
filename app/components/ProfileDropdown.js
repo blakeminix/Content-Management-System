@@ -12,26 +12,6 @@ export function ProfileDropdown() {
   const [username, setUsername] = useState('');
   const pathname = usePathname()
 
-  const getUsername = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/api/getusername', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Get username failed');
-      }
-
-      const data = await response.json();
-      setUsername(data.message);
-    } catch (error) {
-      console.error('Get username failed:', error);
-    }
-  }
-
   function toggleDropdown() {
     const dropdown = document.getElementById("dropdown-content");
     dropdown.classList.toggle("show");
@@ -53,6 +33,26 @@ export function ProfileDropdown() {
   }, []);
 
   useEffect(() => {
+    const getUsername = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/getusername', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+  
+        if (!response.ok) {
+          throw new Error('Get username failed');
+        }
+  
+        const data = await response.json();
+        setUsername(data.message);
+      } catch (error) {
+        console.error('Get username failed:', error);
+      }
+    }
+    
     getUsername();
   }, []);
 

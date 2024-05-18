@@ -188,6 +188,10 @@ export async function getUserGroups() {
   const [groupRow] = await pool.query('SELECT JSON_EXTRACT(`groups`, "$[*]") AS `groups` FROM users WHERE username = ?', [username])
   const groups = groupRow[0].groups;
 
+  if (!groups) {
+    return groupsArray;
+  }
+
   for (const group of groups) {
     const [groupR] = await pool.query('SELECT * FROM `groups` WHERE id = ?', [group]);
     groupsArray.push(groupR[0]);

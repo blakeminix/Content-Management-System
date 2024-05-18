@@ -28,12 +28,14 @@ export default async function Page() {
       <div className="group-row">
         {groups && groups.length > 0 ? (
           groups.map(group => (
-            <Link key={group.id} href={`/groups/${group.id}`}>
-              {group.group_name}
+            <Link className="group-link" key={group.id} href={`/groups/${group.id}`}>
+                <div>{group.group_name}</div>
+                <br />
+                <div>#{group.id}</div>
             </Link>
           ))
         ) : (
-          <p>No groups</p>
+          <p></p>
         )}
       </div>
     </div>
