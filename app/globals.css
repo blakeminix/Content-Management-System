@@ -210,7 +210,7 @@ a {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: calc(100vh - 120px);
+  height: calc(100vh - 60px);
   padding: 20px;
   margin-top: 60px;
   margin-left: 150px;
