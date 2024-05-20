@@ -7,7 +7,7 @@ import { DeleteGroup } from '@/app/components/DeleteGroupButton';
 import { SideBar } from '@/app/components/SideBar';
 
 export const metadata = {
-  title: "Group Settings | CMS",
+  title: "Group Users | CMS",
   description: "A content management system developed using React for the front-end, Next.js as a full-stack framework, and MySQL as the back-end database.",
 };
  
