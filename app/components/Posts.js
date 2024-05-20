@@ -79,9 +79,11 @@ export function Posts() {
           await handlePost(formData);
         }}
         >
-        <input className="text-box" type="post" name="post" placeholder="Post" maxLength={30} autoComplete="off"/>
+        <div className="post-box-container">
+        <input className="post-box" type="post" name="post" placeholder="Post" maxLength={159} autoComplete="off"/>
         <br />
-        <button className="login-button" type="submit">Post</button>
+        <button className="post-button" type="submit">Post</button>
+        </div>
       </form>
     </div>
     </div>
