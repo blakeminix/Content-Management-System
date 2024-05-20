@@ -131,6 +131,10 @@ export async function storePost(post, gid) {
   await pool.query('INSERT INTO posts (username, group_id, content) VALUES (?, ?, ?)', [username, gid, post]);
 }
 
+export async function deletePost(id) {
+  await pool.query('DELETE FROM posts WHERE id = ?', [id]);
+}
+
 export async function getPosts(gid) {
   const [postsRow] = await pool.query('SELECT * FROM posts WHERE group_id = ?', [gid]);
   return postsRow;

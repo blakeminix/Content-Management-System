@@ -67,23 +67,25 @@ export function Posts() {
       {posts && posts.length > 0 ? (
         posts.slice().reverse().map(post => (
           <div className="post" key={post.id}>
-            <div className="post-username">{post.username}</div>
+            <div className="post-username"><a>{post.username}</a><br /> <a>{post.created_at}</a></div>
             <div className="post-content">{post.content}</div>
           </div>
         ))
       ) : (
         <p></p>
       )}
+      </div>
         <form
         action={async (formData) => {
           await handlePost(formData);
         }}
         >
-        <input className="text-box" type="post" name="post" placeholder="Post" maxLength={30} autoComplete="off"/>
+        <div className="post-box-container">
+        <input className="post-box" type="post" name="post" placeholder="Post" maxLength={159} autoComplete="off"/>
         <br />
-        <button className="login-button" type="submit">Post</button>
+        <button className="post-button" type="submit">Post</button>
+        </div>
       </form>
-    </div>
     </div>
   );
 }
