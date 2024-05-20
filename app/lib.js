@@ -121,6 +121,21 @@ export async function signup(formData) {
   }
 }
 
+export async function storePost(post, gid) {
+  const session = cookies().get("session")?.value;
+  if (!session) return;
+
+  const parsed = await decrypt(session);
+  const username = parsed.user.username;
+
+  await pool.query('INSERT INTO posts (username, group_id, content) VALUES (?, ?, ?)', [username, gid, post]);
+}
+
+export async function getPosts(gid) {
+  const [postsRow] = await pool.query('SELECT * FROM posts WHERE group_id = ?', [gid]);
+  return postsRow;
+}
+
 export async function createGroup(formData) {
   const session = cookies().get("session")?.value;
   if (!session) return;

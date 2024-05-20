@@ -35,11 +35,11 @@ export default async function Page() {
         <br />
         <div>
           <input type="radio" id="public" name="is_public" value="public" defaultChecked />
-          <label htmlFor="public">Public</label>
+          <label htmlFor="public"> Public</label>
           <br />
           <br />
           <input type="radio" id="request" name="is_public" value="request" />
-          <label htmlFor="request">Request to Join</label>
+          <label htmlFor="request"> Private</label>
         </div>
         <br />
         <br />
