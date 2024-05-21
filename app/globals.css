@@ -230,6 +230,8 @@ a {
 .post-content {
   color: black;
   font-size: 14px;
+  word-break: break-word;
+  white-space: normal;
 }
 
 .post-username {
@@ -244,12 +246,19 @@ a {
 }
 
 .post-box {
-  height: 35px;
+  height: auto;
   width: calc(100% - 80px);
   border-radius: 7px;
   border: 1px solid #ccc;
-  padding: 0 8px;
+  padding: 8px;
   margin-bottom: 10px;
+  resize: vertical;
+  overflow-y: auto;
+  max-height: 150px;
+}
+
+.post-box[rows="3"] {
+  min-height: 40px;
 }
 
 .post-button {
@@ -351,6 +360,26 @@ a {
 }
 
 .side-bar a:hover {
+}
+
+.delete-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 5px;
+}
+
+.delete-button:hover {
+  background-color: #c0392b;
+}
+
+.delete-button:active {
+  background-color: #a93226;
 }
 
 .focus {
