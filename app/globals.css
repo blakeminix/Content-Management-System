@@ -137,7 +137,6 @@ a {
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   padding: 8px;
   z-index: 1000;
-  border: 1px solid white;
   flex-direction: column;
 }
 
@@ -225,6 +224,7 @@ a {
   border-radius: 8px;
   padding: 15px;
   margin-bottom: 10px;
+  position: relative;
 }
 
 .post-content {
@@ -371,7 +371,9 @@ a {
   font-size: 14px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  margin-top: 5px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 
 .delete-button:hover {
@@ -385,6 +387,22 @@ a {
 .focus {
   background-color: #333;
   border: 1px solid white;
+}
+
+.media-container img,
+.media-container video {
+  max-width: 100%;
+  max-height: 500px;
+  width: auto;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.media-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 @media (prefers-color-scheme: dark) {

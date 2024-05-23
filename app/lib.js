@@ -140,6 +140,28 @@ export async function getPosts(gid) {
   return postsRow;
 }
 
+export async function mediaUpload(filename, fileData, type, mime_type, file_size, gid) {
+  const session = cookies().get("session")?.value;
+  if (!session) return;
+
+  const parsed = await decrypt(session);
+  const username = parsed.user.username;
+
+  const base64Image = fileData.split(';base64,').pop();
+  const buffer = Buffer.from(base64Image, 'base64');
+  
+  await pool.query('INSERT INTO media (filename, file_data, type, mime_type, file_size, username, group_id) VALUES (?, ?, ?, ?, ?, ?, ?)', [filename, buffer, type, mime_type, file_size, username, gid]);
+}
+
+export async function deleteMedia(mediaid) {
+  await pool.query('DELETE from media WHERE id = ?', [mediaid]);
+}
+
+export async function getMedia(gid) {
+  const [mediaRow] = await pool.query('SELECT * FROM media WHERE group_id = ?', [gid]);
+  return mediaRow;
+}
+
 export async function createGroup(formData) {
   const session = cookies().get("session")?.value;
   if (!session) return;
