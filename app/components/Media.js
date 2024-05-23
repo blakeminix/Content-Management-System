@@ -43,7 +43,7 @@ export function Media() {
 
       const mediaWithStringData = data.media.map(post => {
         if (post.file_data && typeof post.file_data !== 'string') {
-          post.file_data = Buffer.from(post.file_data.data).toString('base64');
+          post.file_data = Buffer.from(post.file_data).toString('base64');
         }
         return post;
       });
@@ -69,7 +69,7 @@ export function Media() {
     const reader = new FileReader();
 
     reader.onload = async function (e) {
-      const fileData = e.target.result.split(',')[1];
+      const fileData = e.target.result;
       const filename = file.name;
       const type = file.type;
       const mimeType = type.split('/')[0];
@@ -84,7 +84,7 @@ export function Media() {
         gid
       };
 
-      console.log(typeof fileData);
+      console.log(fileData);
 
       try {
         const response = await fetch('http://localhost:3000/api/mediaupload', {
@@ -109,14 +109,14 @@ export function Media() {
     reader.readAsDataURL(file);
   };
 
-  const deleteMedia = async (media) => {
+  const deleteMedia = async (mediaid) => {
     try {
       const response = await fetch('http://localhost:3000/api/deletemedia', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ media }),
+        body: JSON.stringify({ mediaid }),
       });
 
       if (!response.ok) {
@@ -150,7 +150,7 @@ export function Media() {
             </div>
           ))
         ) : (
-          <p>No media available</p>
+          <p></p>
         )}
       </div>
         <form
