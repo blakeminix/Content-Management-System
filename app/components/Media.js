@@ -136,7 +136,7 @@ export function Media() {
           media.map(post => (
             <div className="post" key={post.id}>
               <Link href={`/users/${post.username}`} className="post-username">{post.username}</Link>
-              <div className="post-username">{post.created_at}</div>
+              <div className="post-username">{post.uploaded_at}</div>
               <div className="media-container">
               {post.mime_type.startsWith('image/') ? (
                 <img src={`data:${post.mime_type};base64,${post.file_data}`} alt={post.filename} />
