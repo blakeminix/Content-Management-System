@@ -8,8 +8,6 @@ export async function POST(req, res) {
       post,
       gid
     } = message;
-    console.log(post);
-    console.log(gid);
     await storePost(post, gid);
     return NextResponse.json({ message: 'Post stored successfully' });
   } catch (error) {
