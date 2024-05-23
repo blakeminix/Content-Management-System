@@ -141,8 +141,6 @@ export async function getPosts(gid) {
 }
 
 export async function mediaUpload(filename, fileData, type, mime_type, file_size, gid) {
-  console.log(`Uploading media: ${filename}, ${type}, ${mime_type}, ${file_size}`);
-
   const session = cookies().get("session")?.value;
   if (!session) return;
 

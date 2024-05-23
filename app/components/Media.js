@@ -137,6 +137,7 @@ export function Media() {
             <div className="post" key={post.id}>
               <Link href={`/users/${post.username}`} className="post-username">{post.username}</Link>
               <div className="post-username">{post.created_at}</div>
+              <div className="media-container">
               {post.mime_type.startsWith('image/') ? (
                 <img src={`data:${post.mime_type};base64,${post.file_data}`} alt={post.filename} />
               ) : post.mime_type.startsWith('video/') ? (
@@ -145,6 +146,7 @@ export function Media() {
                   Your browser does not support the video tag.
                 </video>
               ) : null}
+              </div>
               <br />
               <button onClick={() => deleteMedia(post.id)} className="delete-button">Delete</button>
             </div>
