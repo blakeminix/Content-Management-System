@@ -5,6 +5,7 @@ import { ProfileDropdown } from '@/app/components/ProfileDropdown';
 import { headers } from "next/headers";
 import { DeleteGroup } from '@/app/components/DeleteGroupButton';
 import { SideBar } from '@/app/components/SideBar';
+import { Users } from '@/app/components/Users';
 
 export const metadata = {
   title: "Group Users | CMS",
@@ -27,6 +28,7 @@ export default async function Page() {
         <ProfileDropdown />
       </div>
       <SideBar />
+      <Users />
     </div>
   );
 }

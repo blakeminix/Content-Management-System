@@ -14,7 +14,6 @@ export function SideBar() {
             <Link href={`/groups/${gid}`}>Home</Link>
             <Link href={`/groups/${gid}/posts`}>Posts</Link>
             <Link href={`/groups/${gid}/media`}>Media</Link>
-            <Link href={`/groups/${gid}/files`}>Files</Link>
             <Link href={`/groups/${gid}/users`}>Users</Link>
             <Link href={`/groups/${gid}/settings`}>Settings</Link>
         </div>
