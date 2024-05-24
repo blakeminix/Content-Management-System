@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { logout, getSession, deleteGroup } from '../../../../lib'
 import { redirect } from 'next/navigation';
 import { ProfileDropdown } from '@/app/components/ProfileDropdown';
-import { headers } from "next/headers";
 import { DeleteGroup } from '@/app/components/DeleteGroupButton';
 import { SideBar } from '@/app/components/SideBar';
 
@@ -27,7 +26,9 @@ export default async function Page() {
         <ProfileDropdown />
       </div>
       <SideBar />
+      <div className='post-container'>
       <DeleteGroup />
+      </div>
     </div>
   );
 }

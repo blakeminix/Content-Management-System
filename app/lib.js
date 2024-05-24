@@ -162,6 +162,11 @@ export async function getMedia(gid) {
   return mediaRow;
 }
 
+export async function getUsers(gid) {
+  const [userRow] = await pool.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
+  return userRow;
+}
+
 export async function createGroup(formData) {
   const session = cookies().get("session")?.value;
   if (!session) return;
