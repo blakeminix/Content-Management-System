@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import { DeleteGroup } from '@/app/components/DeleteGroupButton';
 import { SideBar } from '@/app/components/SideBar'
 import { Home } from '@/app/components/Home';
+import { CheckGroup } from '@/app/components/CheckGroup';
 
 export const metadata = {
   title: "Group | CMS",
@@ -28,6 +29,7 @@ export default async function Page() {
         <ProfileDropdown />
       </div>
       <SideBar />
+      <CheckGroup />
       <Home />
     </div>
   );

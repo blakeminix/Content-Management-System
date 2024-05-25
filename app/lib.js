@@ -133,6 +133,21 @@ export async function getDescription(gid) {
   return description;
 }
 
+export async function checkGroup(gid) {
+  try {
+    const [rows] = await pool.query('SELECT * FROM `groups` WHERE id = ?', [gid]);
+
+    if (rows.length === 0) {
+      return false;
+    } else {
+      return true;
+    }
+  } catch (err) {
+    console.error('Error checking group:', err);
+    throw err;
+  }
+}
+
 export async function storePost(post, gid) {
   const session = cookies().get("session")?.value;
   if (!session) return;
