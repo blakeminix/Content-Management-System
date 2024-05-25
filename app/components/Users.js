@@ -44,7 +44,7 @@ export function Users() {
     <div className="post-container">
     <div className='post-list'>
     <div className="post">
-        <div className="post-content">Number of Users in Group: {users.length}</div>
+        <div className="post-content">Users: {users.length}</div>
     </div>
       {users && users.length > 0 ? (
         users.slice().reverse().map(user => (

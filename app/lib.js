@@ -121,6 +121,18 @@ export async function signup(formData) {
   }
 }
 
+export async function addDescription(description, gid) {
+  await pool.query('DELETE FROM description WHERE group_id = ?', [gid]);
+
+  await pool.query('INSERT INTO description (group_id, text) VALUES (?, ?)', [gid, description]);
+}
+
+export async function getDescription(gid) {
+  const description = await pool.query('SELECT text FROM description WHERE group_id = ?', [gid]);
+
+  return description;
+}
+
 export async function storePost(post, gid) {
   const session = cookies().get("session")?.value;
   if (!session) return;
