@@ -148,6 +148,27 @@ export async function checkGroup(gid) {
   }
 }
 
+export async function checkMembership(gid) {
+  const session = cookies().get("session")?.value;
+  if (!session) return;
+
+  const parsed = await decrypt(session);
+  const username = parsed.user.username;
+
+  const [usersRow] = await pool.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
+
+  if (usersRow.length === 0) {
+    return false;
+  }
+
+  for (const usern of usersRow[0].users_in_group) {
+    if (username == usern) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export async function storePost(post, gid) {
   const session = cookies().get("session")?.value;
   if (!session) return;
