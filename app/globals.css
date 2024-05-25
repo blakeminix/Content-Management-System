@@ -257,6 +257,18 @@ a {
   max-height: 150px;
 }
 
+.description-box {
+  height: auto;
+  width: calc(100% - 80px);
+  border-radius: 7px;
+  border: 1px solid #ccc;
+  padding: 8px;
+  margin-bottom: 10px;
+  resize: vertical;
+  overflow-y: auto;
+  max-height: 600px;
+}
+
 .post-box[rows="3"] {
   min-height: 40px;
 }
