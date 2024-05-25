@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import { DeleteGroup } from '@/app/components/DeleteGroupButton';
 import { SideBar } from '@/app/components/SideBar';
 import { Media } from '@/app/components/Media';
+import { CheckGroup } from '@/app/components/CheckGroup';
 
 export const metadata = {
   title: "Group Media | CMS",
@@ -22,12 +23,14 @@ export default async function Page() {
 
   return (
     <div>
+      <CheckGroup />
       <div className="top-bar">
         <Link href="/dashboard">Dashboard</Link>
         <Link href="/creategroup">Create Group</Link>
         <ProfileDropdown />
       </div>
       <SideBar />
+      <CheckGroup />
       <Media />
     </div>
   );

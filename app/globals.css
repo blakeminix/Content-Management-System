@@ -294,6 +294,7 @@ a {
   justify-content: center;
   align-items: center;
   height: 100vh;
+  text-align: center;
 }
 
 
@@ -415,6 +416,35 @@ a {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.not-found-container {
+  background-color: var(--tile-start-rgb);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+}
+
+.not-found-container h1 {
+  font-size: 24px;
+  color: rgb(var(--foreground-rgb));
+  margin-bottom: 20px;
+}
+
+.dashboard-link {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #333;
+  color: #fff;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.dashboard-link:hover {
+  background-color: #555;
 }
 
 @media (prefers-color-scheme: dark) {
