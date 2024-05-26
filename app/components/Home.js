@@ -34,7 +34,6 @@ export function Home() {
       const data = await response.json();
       setDescription(data.description[0][0].text);
     } catch (error) {
-      console.error('Get posts failed:', error);
     }
   };
 

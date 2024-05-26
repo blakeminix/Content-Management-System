@@ -13,7 +13,6 @@ export default async function Page() {
   if (session != null) {
     redirect('/dashboard');
   }
-  // <pre>{JSON.stringify(session, null, 2)}</pre>
   return (
     <section className='centered'>
       <div>

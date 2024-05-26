@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import { DeleteGroup } from '@/app/components/DeleteGroupButton';
 import { SideBar } from '@/app/components/SideBar';
 import { Users } from '@/app/components/Users';
+import { CheckGroup } from '@/app/components/CheckGroup';
 
 export const metadata = {
   title: "Group Users | CMS",
@@ -22,6 +23,7 @@ export default async function Page() {
 
   return (
     <div>
+      <CheckGroup />
       <div className="top-bar">
         <Link href="/dashboard">Dashboard</Link>
         <Link href="/creategroup">Create Group</Link>
