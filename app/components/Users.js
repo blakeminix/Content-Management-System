@@ -32,8 +32,7 @@ export function Users() {
       }
   
       const data = await response.json();
-      const reversedUsers = data.users.slice().reverse();
-      console.log(data.users);
+      const reversedUsers = data.users[0].users_in_group;
       setUsers(reversedUsers);
     } catch (error) {
       console.error('Get users failed:', error);
@@ -44,12 +43,12 @@ export function Users() {
     <div className="post-container">
     <div className='post-list'>
     <div className="post">
-        <div className="post-content">Users: {users.length}</div>
+      <div className="post-content">Users: {users.length}</div>
     </div>
       {users && users.length > 0 ? (
-        users.slice().reverse().map(user => (
-          <div className="post" key={user.users_in_group}>
-            <Link href={`/users/${user.users_in_group}`} className="post-username">{user.users_in_group}</Link>
+        users.map(user => (
+          <div className="post" key={user}>
+            <Link href={`/users/${user}`} className="post-username">{user}</Link>
           </div>
         ))
       ) : (
