@@ -169,6 +169,15 @@ export async function checkMembership(gid) {
   return false;
 }
 
+export async function checkProfile(user) {
+  const [userRow] = await pool.query('SELECT * FROM users WHERE username = ?', [user]);
+
+  if (userRow.length === 0) {
+    return false;
+  }
+  return true;
+}
+
 export async function storePost(post, gid) {
   const session = cookies().get("session")?.value;
   if (!session) return;
