@@ -5,6 +5,7 @@ import { ProfileDropdown } from '@/app/components/ProfileDropdown';
 import { DeleteGroup } from '@/app/components/DeleteGroupButton';
 import { SideBar } from '@/app/components/SideBar';
 import { CheckGroup } from '@/app/components/CheckGroup';
+import { LeaveGroup } from '@/app/components/LeaveGroup';
 
 export const metadata = {
   title: "Group Settings | CMS",
@@ -29,6 +30,7 @@ export default async function Page() {
       </div>
       <SideBar />
       <div className='post-container'>
+      <LeaveGroup />
       <DeleteGroup />
       </div>
     </div>

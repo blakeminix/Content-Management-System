@@ -208,6 +208,28 @@ export async function joinGroup(groupID) {
   await pool.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
 }
 
+export async function leaveGroup(groupID) {
+  const session = cookies().get("session")?.value;
+  if (!session) return;
+
+  const parsed = await decrypt(session);
+  const username = parsed.user.username;
+
+  const gid = parseInt(groupID, 10);
+
+  const [userRow] = await pool.query('SELECT `groups` FROM users WHERE username = ?', [username]);
+  let userGroups = userRow[0]?.groups || [];
+
+  userGroups = userGroups.filter(group => group !== gid);
+  await pool.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), username]);
+
+  const [groupRow] = await pool.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
+  let users = groupRow[0]?.users_in_group || [];
+
+  users = users.filter(user => user !== username);
+  await pool.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
+}
+
 export async function requestToJoin(gid) {
 
 }
