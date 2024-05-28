@@ -179,7 +179,29 @@ export async function checkProfile(user) {
 }
 
 export async function getPrivacy(gid) {
+  const isPriv = await pool.query('SELECT is_request_to_join FROM `groups` WHERE id = ?', [gid]);
+  if (isPriv[0][0].is_request_to_join) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
+export async function getIsRequested(gid) {
+  const session = cookies().get("session")?.value;
+  if (!session) return;
+
+  const parsed = await decrypt(session);
+  const username = parsed.user.username;
+
+  const isReq = await pool.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
+
+  for (const req of isReq[0][0].requests) {
+    if (req == username) {
+      return true;
+    }
+  }
+  return false;
 }
 
 export async function joinGroup(groupID) {
@@ -231,7 +253,40 @@ export async function leaveGroup(groupID) {
 }
 
 export async function requestToJoin(gid) {
+  const session = cookies().get("session")?.value;
+  if (!session) return;
 
+  const parsed = await decrypt(session);
+  const username = parsed.user.username;
+
+  const [requestRow] = await pool.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
+  let requests = requestRow[0]?.requests;
+
+  if (!requests) {
+    requests = []
+  }
+
+  requests.push(username);
+  await pool.query('UPDATE `groups` SET requests = ? WHERE id = ?', [JSON.stringify(requests), gid]);
+}
+
+export async function cancelRequest(gid) {
+  const session = cookies().get("session")?.value;
+  if (!session) return;
+
+  const parsed = await decrypt(session);
+  const username = parsed.user.username;
+
+  const [requestRow] = await pool.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
+  let requests = requestRow[0]?.requests;
+
+  if (!requests) {
+    requests = [];
+  }
+
+  requests = requests.filter(user => user !== username);
+
+  await pool.query('UPDATE `groups` SET requests = ? WHERE id = ?', [JSON.stringify(requests), gid]);
 }
 
 export async function storePost(post, gid) {
