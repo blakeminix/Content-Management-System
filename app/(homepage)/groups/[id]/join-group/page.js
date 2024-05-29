@@ -27,9 +27,7 @@ export default async function Page() {
         <ProfileDropdown />
       </div>
       <div className='not-found-container'>
-        <h1>Join Group</h1>
         <JoinGroup />
-        <Link href='/dashboard' className='dashboard-link'>Back to Dashboard</Link>
       </div>
     </div>
   );

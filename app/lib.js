@@ -179,7 +179,29 @@ export async function checkProfile(user) {
 }
 
 export async function getPrivacy(gid) {
+  const isPriv = await pool.query('SELECT is_request_to_join FROM `groups` WHERE id = ?', [gid]);
+  if (isPriv[0][0].is_request_to_join) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
+export async function getIsRequested(gid) {
+  const session = cookies().get("session")?.value;
+  if (!session) return;
+
+  const parsed = await decrypt(session);
+  const username = parsed.user.username;
+
+  const isReq = await pool.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
+
+  for (const req of isReq[0][0].requests) {
+    if (req == username) {
+      return true;
+    }
+  }
+  return false;
 }
 
 export async function joinGroup(groupID) {
@@ -231,7 +253,40 @@ export async function leaveGroup(groupID) {
 }
 
 export async function requestToJoin(gid) {
+  const session = cookies().get("session")?.value;
+  if (!session) return;
 
+  const parsed = await decrypt(session);
+  const username = parsed.user.username;
+
+  const [requestRow] = await pool.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
+  let requests = requestRow[0]?.requests;
+
+  if (!requests) {
+    requests = []
+  }
+
+  requests.push(username);
+  await pool.query('UPDATE `groups` SET requests = ? WHERE id = ?', [JSON.stringify(requests), gid]);
+}
+
+export async function cancelRequest(gid) {
+  const session = cookies().get("session")?.value;
+  if (!session) return;
+
+  const parsed = await decrypt(session);
+  const username = parsed.user.username;
+
+  const [requestRow] = await pool.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
+  let requests = requestRow[0]?.requests;
+
+  if (!requests) {
+    requests = [];
+  }
+
+  requests = requests.filter(user => user !== username);
+
+  await pool.query('UPDATE `groups` SET requests = ? WHERE id = ?', [JSON.stringify(requests), gid]);
 }
 
 export async function storePost(post, gid) {
@@ -278,6 +333,52 @@ export async function getMedia(gid) {
 export async function getUsers(gid) {
   const [userRow] = await pool.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
   return userRow;
+}
+
+export async function getRequests(gid) {
+  const [reqRow] = await pool.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
+  const req = reqRow[0].requests;
+  return req;
+}
+
+export async function acceptRequest(groupID, accept, user) {
+  const gid = parseInt(groupID, 10);
+
+  const [reqRow] = await pool.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
+  let requests = reqRow[0].requests;
+
+  const [userRow] = await pool.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
+  let users = userRow[0].users_in_group;
+
+  const [groupRow] = await pool.query('SELECT `groups` FROM users WHERE username = ?', [user]);
+  let userGroups = groupRow[0].groups;
+
+  requests = requests.filter(request => request !== user);
+  
+  if (accept) {
+    users.push(user);
+    userGroups.push(gid);
+  }
+
+  await pool.query('UPDATE `groups` SET requests = ? WHERE id = ?', [JSON.stringify(requests), gid]);
+  await pool.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
+  await pool.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), user]);
+}
+
+export async function kickUser(groupID, user) {
+  const gid = parseInt(groupID, 10);
+
+  const [userRow] = await pool.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
+  let users = userRow[0].users_in_group;
+
+  const [groupRow] = await pool.query('SELECT `groups` FROM users WHERE username = ?', [user]);
+  let userGroups = groupRow[0].groups;
+
+  users = users.filter(username => username !== user);
+  userGroups = userGroups.filter(group => group !== gid);
+
+  await pool.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
+  await pool.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), user]);
 }
 
 export async function createGroup(formData) {
