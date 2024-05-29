@@ -12,10 +12,60 @@ export function Posts() {
   const [posts, setPosts] = useState([]);
   const [postContent, setPostContent] = useState("");
   const postListRef = useRef(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchPosts();
-  }, [pathname]);
+    const getGroupAndCheckMembership = async () => {
+      const parts = pathname.split("/");
+      const gid = parts[2];
+
+      try {
+        const groupResponse = await fetch('/api/checkgroup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ gid }),
+        });
+
+        if (!groupResponse.ok) {
+          throw new Error('Get group failed');
+        }
+
+        const groupData = await groupResponse.json();
+        if (!groupData.result) {
+          router.push('/group-not-found');
+          return;
+        }
+
+        const membershipResponse = await fetch('/api/checkmembership', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ gid }),
+        });
+
+        if (!membershipResponse.ok) {
+          throw new Error('Get membership failed');
+        }
+
+        const membershipData = await membershipResponse.json();
+        if (!membershipData.result) {
+          router.push(`/groups/${gid}/join-group`);
+          return;
+        }
+
+        await fetchPosts(gid);
+      } catch (error) {
+        console.error('Error checking group or membership:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getGroupAndCheckMembership();
+  }, [pathname, router]);
 
   useEffect(() => {
     if (postListRef.current) {
@@ -95,6 +145,10 @@ export function Posts() {
     const formattedContent = content.replace(/\n/g, '<br/>');
     return { __html: formattedContent };
   };
+
+  if (loading) {
+    return <div></div>;
+  }
 
   return (
     <div className="post-container">

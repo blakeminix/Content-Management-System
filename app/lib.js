@@ -196,6 +196,10 @@ export async function getIsRequested(gid) {
 
   const isReq = await pool.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
 
+  if (!isReq) {
+    return false;
+  }
+
   for (const req of isReq[0][0].requests) {
     if (req == username) {
       return true;

@@ -11,11 +11,61 @@ export function Users() {
   const pathname = usePathname();
   const [users, setUsers] = useState([]);
   const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchUsers();
-    fetchRequests();
-  }, [pathname]);
+    const getGroupAndCheckMembership = async () => {
+      const parts = pathname.split("/");
+      const gid = parts[2];
+
+      try {
+        const groupResponse = await fetch('/api/checkgroup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ gid }),
+        });
+
+        if (!groupResponse.ok) {
+          throw new Error('Get group failed');
+        }
+
+        const groupData = await groupResponse.json();
+        if (!groupData.result) {
+          router.push('/group-not-found');
+          return;
+        }
+
+        const membershipResponse = await fetch('/api/checkmembership', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ gid }),
+        });
+
+        if (!membershipResponse.ok) {
+          throw new Error('Get membership failed');
+        }
+
+        const membershipData = await membershipResponse.json();
+        if (!membershipData.result) {
+          router.push(`/groups/${gid}/join-group`);
+          return;
+        }
+
+        await fetchUsers();
+        await fetchRequests();
+      } catch (error) {
+        console.error('Error checking group or membership:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getGroupAndCheckMembership();
+  }, [pathname, router]);
 
   const fetchUsers = async () => {
     const parts = pathname.split("/");
@@ -111,6 +161,10 @@ export function Users() {
       console.error('Get users failed:', error);
     }
   };
+
+  if (loading) {
+    return <div></div>;
+  }
 
   return (
     <div className="post-container">
