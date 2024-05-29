@@ -1,15 +1,13 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import '../globals.css'
+import '../globals.css';
 import { useRouter } from "next/navigation";
 import { usePathname } from 'next/navigation';
-import Link from 'next/link';
 
-export function Home() {
+export function GroupSettings() {
   const router = useRouter();
   const pathname = usePathname();
-  const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(true);
   const [isMember, setIsMember] = useState(false);
 
@@ -55,7 +53,6 @@ export function Home() {
           return;
         }
 
-        await fetchDescription(gid);
         setIsMember(true);
       } catch (error) {
         console.error('Error checking group or membership:', error);
@@ -67,48 +64,47 @@ export function Home() {
     getGroupAndCheckMembership();
   }, [pathname, router]);
 
-  const fetchDescription = async (gid) => {
+  const handleLeave = async () => {
+    const parts = pathname.split("/");
+    const gid = parts[2];
     try {
-      const response = await fetch('http://localhost:3000/api/getdescription', {
+      const response = await fetch('http://localhost:3000/api/leavegroup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ gid }),
       });
-  
+
       if (!response.ok) {
-        throw new Error('Get description failed');
+        throw new Error('Leave group failed');
       }
-  
-      const data = await response.json();
-      setDescription(data.description[0][0].text);
+
+      router.push('/dashboard');
     } catch (error) {
-      console.error('Get description failed:', error);
+      console.error('Leave group failed:', error);
     }
   };
 
-  const handleDescription = async (formData) => {
+  const handleDeleteGroup = async () => {
     const parts = pathname.split("/");
     const gid = parts[2];
-    const description = formData.get('description');
     try {
-      const response = await fetch('http://localhost:3000/api/adddescription', {
+      const response = await fetch('http://localhost:3000/api/deletegroup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ description, gid }),
+        body: JSON.stringify({ gid }),
       });
 
       if (!response.ok) {
-        throw new Error('Add description failed');
+        throw new Error('Delete group failed');
       }
-      fetchDescription(gid);
     } catch (error) {
-      console.error('Add description failed:', error);
+      console.error('Delete group failed:', error);
     }
-    router.refresh();
+    router.push('/dashboard');
   };
 
   if (loading) {
@@ -116,19 +112,12 @@ export function Home() {
   }
 
   return (
-    <div className="post-container">
+    <div className='group-row'>
       {isMember && (
-      <form
-        action={async (formData) => {
-          await handleDescription(formData);
-        }}
-      >
-        <div className="post-box-container">
-          <textarea className="description-box" type="post" name="description" placeholder="Description" autoComplete="off" rows={100} maxLength={100000} value={description} onChange={(e) => setDescription(e.target.value)}/>
-          <br />
-          <button className="post-button" type="submit">Upload Description</button>
-        </div>
-      </form>
+        <>
+          <button className="login-button" onClick={handleLeave}>Leave Group</button>
+          <button className="login-button" onClick={handleDeleteGroup}>Delete Group</button>
+        </>
       )}
     </div>
   );

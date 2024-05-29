@@ -13,6 +13,7 @@ export function Media() {
   const [mediaContent, setMediaContent] = useState("");
   const postListRef = useRef(null);
   const [loading, setLoading] = useState(true);
+  const [isMember, setIsMember] = useState(false);
 
   useEffect(() => {
     const getGroupAndCheckMembership = async () => {
@@ -57,6 +58,7 @@ export function Media() {
         }
 
         await fetchMedia(gid);
+        setIsMember(true);
       } catch (error) {
         console.error('Error checking group or membership:', error);
       } finally {
@@ -185,39 +187,40 @@ export function Media() {
 
   return (
     <div className="post-container">
-      <div ref={postListRef} className='post-list'>
-        {media && media.length > 0 ? (
-          media.map(post => (
-            <div className="post" key={post.id}>
-              <Link href={`/users/${post.username}`} className="post-username">{post.username}</Link>
-              <div className="post-username">{post.uploaded_at}</div>
-              <div className="media-container">
-              {post.mime_type.startsWith('image/') ? (
-                <img src={`data:${post.mime_type};base64,${post.file_data}`} alt={post.filename} />
-              ) : post.mime_type.startsWith('video/') ? (
-                <video controls>
-                  <source src={`data:${post.mime_type};base64,${post.file_data}`} type={post.mime_type} />
-                  Your browser does not support the video tag.
-                </video>
-              ) : null}
+    {isMember && (
+      <><div ref={postListRef} className='post-list'>
+          {media && media.length > 0 ? (
+            media.map(post => (
+              <div className="post" key={post.id}>
+                <Link href={`/users/${post.username}`} className="post-username">{post.username}</Link>
+                <div className="post-username">{post.uploaded_at}</div>
+                <div className="media-container">
+                  {post.mime_type.startsWith('image/') ? (
+                    <img src={`data:${post.mime_type};base64,${post.file_data}`} alt={post.filename} />
+                  ) : post.mime_type.startsWith('video/') ? (
+                    <video controls>
+                      <source src={`data:${post.mime_type};base64,${post.file_data}`} type={post.mime_type} />
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : null}
+                </div>
+                <br />
+                <button onClick={() => deleteMedia(post.id)} className="delete-button">Delete</button>
               </div>
-              <br />
-              <button onClick={() => deleteMedia(post.id)} className="delete-button">Delete</button>
-            </div>
-          ))
-        ) : (
-          <p></p>
-        )}
-      </div>
-        <form
-        onSubmit={handleMediaUpload}
+            ))
+          ) : (
+            <p></p>
+          )}
+        </div><form
+          onSubmit={handleMediaUpload}
         >
-        <div className="post-box-container">
-        <input type="file" id="mediaInput" accept="image/*, video/*" />
-        <br />
-        <button className="post-button" type="submit">Upload</button>
-        </div>
-      </form>
+            <div className="post-box-container">
+              <input type="file" id="mediaInput" accept="image/*, video/*" />
+              <br />
+              <button className="post-button" type="submit">Upload</button>
+            </div>
+          </form></>
+    )}
     </div>
   );
 }

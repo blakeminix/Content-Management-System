@@ -12,6 +12,7 @@ export function Users() {
   const [users, setUsers] = useState([]);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isMember, setIsMember] = useState(false);
 
   useEffect(() => {
     const getGroupAndCheckMembership = async () => {
@@ -57,6 +58,7 @@ export function Users() {
 
         await fetchUsers();
         await fetchRequests();
+        setIsMember(true);
       } catch (error) {
         console.error('Error checking group or membership:', error);
       } finally {
@@ -168,7 +170,8 @@ export function Users() {
 
   return (
     <div className="post-container">
-    <div className='post-list'>
+    {isMember && (
+    <><div className='post-list'>
     <div className="post">
       <div className="post-content">Users: {users.length}</div>
     </div>
@@ -199,7 +202,8 @@ export function Users() {
       ) : (
         <p></p>
       )}
-      </div>
+      </div></>
+    )}
     </div>
   );
 }

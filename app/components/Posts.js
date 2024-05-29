@@ -13,6 +13,7 @@ export function Posts() {
   const [postContent, setPostContent] = useState("");
   const postListRef = useRef(null);
   const [loading, setLoading] = useState(true);
+  const [isMember, setIsMember] = useState(false);
 
   useEffect(() => {
     const getGroupAndCheckMembership = async () => {
@@ -57,6 +58,7 @@ export function Posts() {
         }
 
         await fetchPosts(gid);
+        setIsMember(true);
       } catch (error) {
         console.error('Error checking group or membership:', error);
       } finally {
@@ -152,32 +154,33 @@ export function Posts() {
 
   return (
     <div className="post-container">
-    <div ref={postListRef} className='post-list'>
-      {posts && posts.length > 0 ? (
-        posts.slice().reverse().map(post => (
-          <div className="post" key={post.id}>
-            <Link href={`/users/${post.username}`} className="post-username">{post.username}</Link>
-            <div className="post-username">{post.created_at}</div>
-            <div className="post-content" dangerouslySetInnerHTML={createMarkup(post.content)} />
-            <br />
-            <button onClick={() => deletePost(post.id)} className="delete-button">Delete</button>
-          </div>
-        ))
-      ) : (
-        <p></p>
-      )}
-      </div>
-        <form
-        action={async (formData) => {
-          await handlePost(formData);
-        }}
+    {isMember && (
+    <><div ref={postListRef} className='post-list'>
+          {posts && posts.length > 0 ? (
+            posts.slice().reverse().map(post => (
+              <div className="post" key={post.id}>
+                <Link href={`/users/${post.username}`} className="post-username">{post.username}</Link>
+                <div className="post-username">{post.created_at}</div>
+                <div className="post-content" dangerouslySetInnerHTML={createMarkup(post.content)} />
+                <br />
+                <button onClick={() => deletePost(post.id)} className="delete-button">Delete</button>
+              </div>
+            ))
+          ) : (
+            <p></p>
+          )}
+        </div><form
+          action={async (formData) => {
+            await handlePost(formData);
+          } }
         >
-        <div className="post-box-container">
-        <textarea className="post-box" type="post" name="post" placeholder="Post" autoComplete="off" rows={3} maxLength={10000} value={postContent} onChange={(e) => setPostContent(e.target.value)}/>
-        <br />
-        <button className="post-button" type="submit">Post</button>
-        </div>
-      </form>
+            <div className="post-box-container">
+              <textarea className="post-box" type="post" name="post" placeholder="Post" autoComplete="off" rows={3} maxLength={10000} value={postContent} onChange={(e) => setPostContent(e.target.value)} />
+              <br />
+              <button className="post-button" type="submit">Post</button>
+            </div>
+          </form></>
+      )}
     </div>
   );
 }

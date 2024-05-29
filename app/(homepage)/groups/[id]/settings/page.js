@@ -6,6 +6,7 @@ import { DeleteGroup } from '@/app/components/DeleteGroupButton';
 import { SideBar } from '@/app/components/SideBar';
 import { CheckGroup } from '@/app/components/CheckGroup';
 import { LeaveGroup } from '@/app/components/LeaveGroup';
+import { GroupSettings } from '@/app/components/GroupSettings';
 
 export const metadata = {
   title: "Group Settings | CMS",
@@ -22,7 +23,6 @@ export default async function Page() {
 
   return (
     <div>
-      <CheckGroup />
       <div className="top-bar">
         <Link href="/dashboard">Dashboard</Link>
         <Link href="/creategroup">Create Group</Link>
@@ -30,8 +30,7 @@ export default async function Page() {
       </div>
       <SideBar />
       <div className='post-container'>
-      <LeaveGroup />
-      <DeleteGroup />
+        <GroupSettings />
       </div>
     </div>
   );
