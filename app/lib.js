@@ -365,6 +365,22 @@ export async function acceptRequest(groupID, accept, user) {
   await pool.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), user]);
 }
 
+export async function kickUser(groupID, user) {
+  const gid = parseInt(groupID, 10);
+
+  const [userRow] = await pool.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
+  let users = userRow[0].users_in_group;
+
+  const [groupRow] = await pool.query('SELECT `groups` FROM users WHERE username = ?', [user]);
+  let userGroups = groupRow[0].groups;
+
+  users = users.filter(username => username !== user);
+  userGroups = userGroups.filter(group => group !== gid);
+
+  await pool.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
+  await pool.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), user]);
+}
+
 export async function createGroup(formData) {
   const session = cookies().get("session")?.value;
   if (!session) return;

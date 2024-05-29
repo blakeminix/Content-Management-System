@@ -89,6 +89,29 @@ export function Users() {
     }
   };
 
+  const kickUser = async (user) => {
+    const parts = pathname.split("/");
+    const gid = parts[2];
+    try {
+      const response = await fetch('http://localhost:3000/api/kickuser', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ gid, user }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Get users failed');
+      }
+  
+      const data = await response.json();
+      fetchUsers();
+    } catch (error) {
+      console.error('Get users failed:', error);
+    }
+  };
+
   return (
     <div className="post-container">
     <div className='post-list'>
@@ -99,6 +122,7 @@ export function Users() {
         users.map(user => (
           <div className="post" key={user}>
             <Link href={`/users/${user}`} className="post-username">{user}</Link>
+            <button onClick={() => kickUser(user)} className="delete-button">Kick</button>
           </div>
         ))
       ) : (
