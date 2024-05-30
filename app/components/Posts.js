@@ -170,7 +170,6 @@ export function Posts() {
             posts.slice().reverse().map(post => (
               <div className="post" key={post.id}>
                 <Link href={`/users/${post.username}`} className="post-username">{post.username}</Link>
-                <div className="post-username">{post.created_at}</div>
                 <div className="post-content" dangerouslySetInnerHTML={createMarkup(post.content)} />
                 <br />
                 {(isOwner || (isModerator && !post.isModerator) || post.isMe) && (
