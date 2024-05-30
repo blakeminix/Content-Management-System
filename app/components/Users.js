@@ -15,6 +15,7 @@ export function Users() {
   const [isMember, setIsMember] = useState(false);
   const [isModerator, setIsModerator] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const [privacy, setPrivacy] = useState(false);
 
   useEffect(() => {
     const getGroupAndCheckMembership = async () => {
@@ -76,7 +77,35 @@ export function Users() {
       }
     };
 
+    const getPrivacy = async () => {
+      const parts = pathname.split("/");
+      const gid = parts[2];
+      try {
+        const response = await fetch('http://localhost:3000/api/getprivacy', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ gid }),
+        });
+    
+        if (!response.ok) {
+          throw new Error('Get posts failed');
+        }
+
+        const data = await response.json();
+        if (!data.result) {
+          setPrivacy(false);
+        } else {
+          setPrivacy(true);
+        }
+      } catch (error) {
+
+      }
+    };
+
     getGroupAndCheckMembership();
+    getPrivacy();
   }, [pathname, router]);
 
   const fetchUsers = async () => {
@@ -199,6 +228,7 @@ export function Users() {
       )}
       </div>
 
+    {privacy && isModerator && (
     <div className='post-list'>
     <div className="post">
       <div className="post-content">Requests: {requests.length}</div>
@@ -214,7 +244,9 @@ export function Users() {
       ) : (
         <p></p>
       )}
-      </div></>
+      </div>
+      )}
+      </>
     )}
     </div>
   );
