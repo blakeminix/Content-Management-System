@@ -13,6 +13,8 @@ export function Users() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isMember, setIsMember] = useState(false);
+  const [isModerator, setIsModerator] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     const getGroupAndCheckMembership = async () => {
@@ -56,6 +58,14 @@ export function Users() {
           return;
         }
 
+        if (membershipData.isOwner) {
+          setIsOwner(true);
+        }
+
+        if (membershipData.isModerator) {
+          setIsModerator(true);
+        }
+
         await fetchUsers();
         await fetchRequests();
         setIsMember(true);
@@ -86,7 +96,7 @@ export function Users() {
       }
   
       const data = await response.json();
-      const reversedUsers = data.users[0].users_in_group;
+      const reversedUsers = data.users;
       setUsers(reversedUsers || []);
     } catch (error) {
       console.error('Get users failed:', error);
@@ -178,8 +188,10 @@ export function Users() {
       {users && users.length > 0 ? (
         users.map(user => (
           <div className="post" key={user}>
-            <Link href={`/users/${user}`} className="post-username">{user}</Link>
-            <button onClick={() => kickUser(user)} className="delete-button">Kick</button>
+            <Link href={`/users/${user.username}`} className="post-username">{user.username}</Link>
+            {((isOwner || (isModerator && !user.isModerator)) && !user.isMe) && (
+              <button onClick={() => kickUser(user.username)} className="delete-button">Kick</button>
+            )}
           </div>
         ))
       ) : (

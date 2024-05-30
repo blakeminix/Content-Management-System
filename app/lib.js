@@ -399,7 +399,6 @@ export async function getMedia(gid) {
 
   const mediaArray = [];
   const [mediaRow] = await pool.query('SELECT * FROM media WHERE group_id = ?', [gid]);
-  console.log(mediaRow);
 
   const [ownerRow] = await pool.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
   const owner = ownerRow[0].owner_username;
@@ -450,8 +449,53 @@ export async function getMedia(gid) {
 }
 
 export async function getUsers(gid) {
+  const session = cookies().get("session")?.value;
+  if (!session) return;
+
+  const parsed = await decrypt(session);
+  const username = parsed.user.username;
+
+  const userArray = [];
   const [userRow] = await pool.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
-  return userRow;
+  const users = userRow[0].users_in_group;
+
+  const [ownerRow] = await pool.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
+  const owner = ownerRow[0].owner_username;
+
+  const [mods] = await pool.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
+  const moderators = mods[0].moderators;
+
+  for (const user of users) {
+    let isOwner = false;
+    let isModerator = false;
+    let isMe = false;
+    if (user == owner) {
+      isOwner = true;
+    }
+
+    for (const mod of moderators) {
+      if (user == mod) {
+        isModerator = true;
+      }
+    }
+
+    if (user == username) {
+      isMe = true;
+    }
+
+    console.log(user);
+
+    const userObject = {
+      username: user,
+      isMe: isMe,
+      isOwner: isOwner,
+      isModerator: isModerator
+    };
+    userArray.push(userObject);
+  }
+  console.log(userArray);
+
+  return userArray;
 }
 
 export async function getRequests(gid) {
