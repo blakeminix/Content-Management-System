@@ -14,6 +14,8 @@ export function Media() {
   const postListRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [isMember, setIsMember] = useState(false);
+  const [isModerator, setIsModerator] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     const getGroupAndCheckMembership = async () => {
@@ -55,6 +57,14 @@ export function Media() {
         if (!membershipData.isMember) {
           router.push(`/groups/${gid}/join-group`);
           return;
+        }
+
+        if (membershipData.isOwner) {
+          setIsOwner(true);
+        }
+
+        if (membershipData.isModerator) {
+          setIsModerator(true);
         }
 
         await fetchMedia(gid);
@@ -193,19 +203,20 @@ export function Media() {
             media.map(post => (
               <div className="post" key={post.id}>
                 <Link href={`/users/${post.username}`} className="post-username">{post.username}</Link>
-                <div className="post-username">{post.uploaded_at}</div>
                 <div className="media-container">
                   {post.mime_type.startsWith('image/') ? (
                     <img src={`data:${post.mime_type};base64,${post.file_data}`} alt={post.filename} />
                   ) : post.mime_type.startsWith('video/') ? (
                     <video controls>
                       <source src={`data:${post.mime_type};base64,${post.file_data}`} type={post.mime_type} />
-                      Your browser does not support the video tag.
+                      
                     </video>
                   ) : null}
                 </div>
                 <br />
-                <button onClick={() => deleteMedia(post.id)} className="delete-button">Delete</button>
+                {(isOwner || (isModerator && !post.isModerator) || post.isMe) && (
+                  <button onClick={() => deleteMedia(post.id)} className="delete-button">Delete</button>
+                )}
               </div>
             ))
           ) : (

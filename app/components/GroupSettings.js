@@ -10,6 +10,8 @@ export function GroupSettings() {
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [isMember, setIsMember] = useState(false);
+  const [isModerator, setIsModerator] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     const getGroupAndCheckMembership = async () => {
@@ -51,6 +53,14 @@ export function GroupSettings() {
         if (!membershipData.isMember) {
           router.push(`/groups/${gid}/join-group`);
           return;
+        }
+
+        if (membershipData.isOwner) {
+          setIsOwner(true);
+        }
+
+        if (membershipData.isModerator) {
+          setIsModerator(true);
         }
 
         setIsMember(true);
@@ -116,7 +126,9 @@ export function GroupSettings() {
       {isMember && (
         <>
           <button className="login-button" onClick={handleLeave}>Leave Group</button>
-          <button className="login-button" onClick={handleDeleteGroup}>Delete Group</button>
+          {isOwner && (
+            <button className="login-button" onClick={handleDeleteGroup}>Delete Group</button>
+          )}
         </>
       )}
     </div>

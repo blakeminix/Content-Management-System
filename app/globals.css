@@ -419,6 +419,50 @@ a {
   background-color: #008b05;
 }
 
+.mod-button {
+  background-color: #00a103;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  position: absolute;
+  top: 10px;
+  right: 75px;
+}
+
+.mod-button:hover {
+  background-color: #008b05;
+}
+
+.mod-button:active {
+  background-color: #008b05;
+}
+
+.remove-mod-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  position: absolute;
+  top: 10px;
+  right: 75px;
+}
+
+.remove-mod-button:hover {
+  background-color: #c0392b;
+}
+
+.remove-mod-button:active {
+  background-color: #a93226;
+}
+
 .focus {
   background-color: #333;
   border: 1px solid white;

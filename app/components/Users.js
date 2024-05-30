@@ -13,6 +13,9 @@ export function Users() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isMember, setIsMember] = useState(false);
+  const [isModerator, setIsModerator] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
+  const [privacy, setPrivacy] = useState(false);
 
   useEffect(() => {
     const getGroupAndCheckMembership = async () => {
@@ -56,6 +59,14 @@ export function Users() {
           return;
         }
 
+        if (membershipData.isOwner) {
+          setIsOwner(true);
+        }
+
+        if (membershipData.isModerator) {
+          setIsModerator(true);
+        }
+
         await fetchUsers();
         await fetchRequests();
         setIsMember(true);
@@ -66,7 +77,35 @@ export function Users() {
       }
     };
 
+    const getPrivacy = async () => {
+      const parts = pathname.split("/");
+      const gid = parts[2];
+      try {
+        const response = await fetch('http://localhost:3000/api/getprivacy', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ gid }),
+        });
+    
+        if (!response.ok) {
+          throw new Error('Get posts failed');
+        }
+
+        const data = await response.json();
+        if (!data.result) {
+          setPrivacy(false);
+        } else {
+          setPrivacy(true);
+        }
+      } catch (error) {
+
+      }
+    };
+
     getGroupAndCheckMembership();
+    getPrivacy();
   }, [pathname, router]);
 
   const fetchUsers = async () => {
@@ -86,7 +125,7 @@ export function Users() {
       }
   
       const data = await response.json();
-      const reversedUsers = data.users[0].users_in_group;
+      const reversedUsers = data.users;
       setUsers(reversedUsers || []);
     } catch (error) {
       console.error('Get users failed:', error);
@@ -140,6 +179,53 @@ export function Users() {
       console.error('Get users failed:', error);
     }
   };
+  
+  const handleMod = async (user) => {
+    const parts = pathname.split("/");
+    const gid = parts[2];
+    try {
+      const response = await fetch('http://localhost:3000/api/handlemod', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ gid, user }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Get users failed');
+      }
+  
+      const data = await response.json();
+      fetchUsers();
+    } catch (error) {
+      console.error('Get users failed:', error);
+    }
+  };
+
+  const removeMod = async (user) => {
+    const parts = pathname.split("/");
+    const gid = parts[2];
+    try {
+      const response = await fetch('http://localhost:3000/api/removemod', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ gid, user }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Get users failed');
+      }
+  
+      const data = await response.json();
+      fetchUsers();
+    } catch (error) {
+      console.error('Get users failed:', error);
+    }
+  };
+
 
   const kickUser = async (user) => {
     const parts = pathname.split("/");
@@ -178,8 +264,16 @@ export function Users() {
       {users && users.length > 0 ? (
         users.map(user => (
           <div className="post" key={user}>
-            <Link href={`/users/${user}`} className="post-username">{user}</Link>
-            <button onClick={() => kickUser(user)} className="delete-button">Kick</button>
+            <Link href={`/users/${user.username}`} className="post-username">{user.username}</Link>
+            {isOwner && !user.isModerator && !user.isMe && (
+              <button onClick={() => handleMod(user.username)} className="mod-button">Mod</button>
+            )}
+            {isOwner && user.isModerator && !user.isMe && (
+              <button onClick={() => removeMod(user.username)} className="remove-mod-button">Remove Mod</button>
+            )}
+            {((isOwner || (isModerator && !user.isModerator)) && !user.isMe) && (
+              <button onClick={() => kickUser(user.username)} className="delete-button">Kick</button>
+            )}
           </div>
         ))
       ) : (
@@ -187,6 +281,7 @@ export function Users() {
       )}
       </div>
 
+    {privacy && isModerator && (
     <div className='post-list'>
     <div className="post">
       <div className="post-content">Requests: {requests.length}</div>
@@ -202,7 +297,9 @@ export function Users() {
       ) : (
         <p></p>
       )}
-      </div></>
+      </div>
+      )}
+      </>
     )}
     </div>
   );
