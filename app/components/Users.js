@@ -179,6 +179,53 @@ export function Users() {
       console.error('Get users failed:', error);
     }
   };
+  
+  const handleMod = async (user) => {
+    const parts = pathname.split("/");
+    const gid = parts[2];
+    try {
+      const response = await fetch('http://localhost:3000/api/handlemod', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ gid, user }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Get users failed');
+      }
+  
+      const data = await response.json();
+      fetchUsers();
+    } catch (error) {
+      console.error('Get users failed:', error);
+    }
+  };
+
+  const removeMod = async (user) => {
+    const parts = pathname.split("/");
+    const gid = parts[2];
+    try {
+      const response = await fetch('http://localhost:3000/api/removemod', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ gid, user }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Get users failed');
+      }
+  
+      const data = await response.json();
+      fetchUsers();
+    } catch (error) {
+      console.error('Get users failed:', error);
+    }
+  };
+
 
   const kickUser = async (user) => {
     const parts = pathname.split("/");
@@ -218,6 +265,12 @@ export function Users() {
         users.map(user => (
           <div className="post" key={user}>
             <Link href={`/users/${user.username}`} className="post-username">{user.username}</Link>
+            {isOwner && !user.isModerator && !user.isMe && (
+              <button onClick={() => handleMod(user.username)} className="mod-button">Mod</button>
+            )}
+            {isOwner && user.isModerator && !user.isMe && (
+              <button onClick={() => removeMod(user.username)} className="remove-mod-button">Remove Mod</button>
+            )}
             {((isOwner || (isModerator && !user.isModerator)) && !user.isMe) && (
               <button onClick={() => kickUser(user.username)} className="delete-button">Kick</button>
             )}

@@ -578,8 +578,6 @@ export async function getUsers(gid) {
       isMe = true;
     }
 
-    console.log(user);
-
     const userObject = {
       username: user,
       isMe: isMe,
@@ -588,7 +586,6 @@ export async function getUsers(gid) {
     };
     userArray.push(userObject);
   }
-  console.log(userArray);
 
   return userArray;
 } finally {
@@ -634,6 +631,42 @@ export async function acceptRequest(groupID, accept, user) {
 } finally {
   connection.release();
 }
+}
+
+export async function handleMod(gid, user) {
+  const connection = await pool.getConnection();
+  try {
+    const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
+    let moderators = mods[0].moderators;
+
+    if (!moderators) {
+      moderators = [];
+    }
+
+    moderators.push(user);
+
+    await connection.query('UPDATE `groups` SET moderators = ? WHERE id = ?', [JSON.stringify(moderators), gid]);
+  } finally {
+    connection.release();
+  }
+}
+
+export async function removeMod(gid, user) {
+  const connection = await pool.getConnection();
+  try {
+    const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
+    let moderators = mods[0].moderators;
+
+    if (!moderators) {
+      moderators = [];
+    }
+
+    moderators = moderators.filter(mod => mod !== user);
+
+    await connection.query('UPDATE `groups` SET moderators = ? WHERE id = ?', [JSON.stringify(moderators), gid]);
+  } finally {
+    connection.release();
+  }
 }
 
 export async function kickUser(groupID, user) {
