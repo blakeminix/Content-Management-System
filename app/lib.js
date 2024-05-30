@@ -157,16 +157,33 @@ export async function checkMembership(gid) {
 
   const [usersRow] = await pool.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
 
+  const [owner] = await pool.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
+  let isOwner = false;
+
+  if (username == owner[0].owner_username) {
+    isOwner = true;
+  }
+
+  const [mods] = await pool.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
+  const moderators = mods[0].moderators;
+  let isModerator = false;
+
+  for (const mod of moderators) {
+    if (mod == username) {
+      isModerator = true;
+    }
+  }
+
   if (usersRow.length === 0) {
-    return false;
+    return { isMember: false, isOwner, isModerator };
   }
 
   for (const usern of usersRow[0].users_in_group) {
     if (username == usern) {
-      return true;
+      return { isMember: true, isOwner, isModerator };
     }
   }
-  return false;
+  return { isMember: false, isOwner, isModerator };
 }
 
 export async function checkProfile(user) {
@@ -195,6 +212,10 @@ export async function getIsRequested(gid) {
   const username = parsed.user.username;
 
   const isReq = await pool.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
+
+  if (!isReq || !isReq[0] || !isReq[0][0] || !isReq[0][0].requests) {
+    return false;
+  }
 
   for (const req of isReq[0][0].requests) {
     if (req == username) {
@@ -304,8 +325,52 @@ export async function deletePost(id) {
 }
 
 export async function getPosts(gid) {
+  const session = cookies().get("session")?.value;
+  if (!session) return;
+
+  const parsed = await decrypt(session);
+  const username = parsed.user.username;
+
+  const postArray = [];
   const [postsRow] = await pool.query('SELECT * FROM posts WHERE group_id = ?', [gid]);
-  return postsRow;
+
+  const [ownerRow] = await pool.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
+  const owner = ownerRow[0].owner_username;
+
+  const [mods] = await pool.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
+  const moderators = mods[0].moderators;
+
+  for (let post of postsRow) {
+    let isOwner = false;
+    let isModerator = false;
+    let isMe = false;
+    if (post.username == owner) {
+      isOwner = true;
+    }
+
+    for (const mod of moderators) {
+      if (post.username == mod) {
+        isModerator = true;
+      }
+    }
+
+    if (post.username == username) {
+      isMe = true;
+    }
+
+    post = {
+      id: post.id,
+      group_id: post.group_id,
+      content: post.content,
+      created_at: post.created_at,
+      username: post.username,
+      isMe: isMe,
+      isModerator: isModerator,
+      isOwner: isOwner
+    };
+    postArray.push(post);
+  }
+  return postArray;
 }
 
 export async function mediaUpload(filename, fileData, type, mime_type, file_size, gid) {

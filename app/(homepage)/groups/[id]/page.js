@@ -23,7 +23,6 @@ export default async function Page() {
 
   return (
     <div>
-      <CheckGroup />
       <div className="top-bar">
         <Link href="/dashboard">Dashboard</Link>
         <Link href="/creategroup">Create Group</Link>
