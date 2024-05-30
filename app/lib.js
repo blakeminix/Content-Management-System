@@ -391,8 +391,62 @@ export async function deleteMedia(mediaid) {
 }
 
 export async function getMedia(gid) {
+  const session = cookies().get("session")?.value;
+  if (!session) return;
+
+  const parsed = await decrypt(session);
+  const username = parsed.user.username;
+
+  const mediaArray = [];
   const [mediaRow] = await pool.query('SELECT * FROM media WHERE group_id = ?', [gid]);
-  return mediaRow;
+  console.log(mediaRow);
+
+  const [ownerRow] = await pool.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
+  const owner = ownerRow[0].owner_username;
+
+  const [mods] = await pool.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
+  const moderators = mods[0].moderators;
+
+  for (let media of mediaRow) {
+    let isOwner = false;
+    let isModerator = false;
+    let isMe = false;
+    if (media.username == owner) {
+      isOwner = true;
+    }
+
+    for (const mod of moderators) {
+      if (media.username == mod) {
+        isModerator = true;
+      }
+    }
+
+    if (media.username == username) {
+      isMe = true;
+    }
+
+    media = {
+      id: media.id,
+      filename: media.filename,
+      file_data: media.file_data,
+      type: media.type,
+      mime_type: media.mime_type,
+      file_size: media.file_size,
+      width: media.width,
+      height: media.height,
+      duration: media.duration,
+      uploaded_at: media.uploaded_at,
+      description: media.description,
+      username: media.username,
+      group_id: media.group_id,
+      isMe: isMe,
+      isModerator: isModerator,
+      isOwner: isOwner
+    };
+    mediaArray.push(media);
+  }
+
+  return mediaArray;
 }
 
 export async function getUsers(gid) {
