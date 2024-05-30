@@ -12,6 +12,8 @@ export function Home() {
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(true);
   const [isMember, setIsMember] = useState(false);
+  const [isModerator, setIsModerator] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     const getGroupAndCheckMembership = async () => {
@@ -50,9 +52,17 @@ export function Home() {
         }
 
         const membershipData = await membershipResponse.json();
-        if (!membershipData.result) {
+        if (!membershipData.isMember) {
           router.push(`/groups/${gid}/join-group`);
           return;
+        }
+
+        if (membershipData.isOwner) {
+          setIsOwner(true);
+        }
+
+        if (membershipData.isModerator) {
+          setIsModerator(true);
         }
 
         await fetchDescription(gid);
@@ -111,24 +121,39 @@ export function Home() {
     router.refresh();
   };
 
+  const createMarkup = (content) => {
+    const formattedContent = content.replace(/\n/g, '<br/>');
+    return { __html: formattedContent };
+  };
+
   if (loading) {
     return <div></div>;
   }
 
   return (
     <div className="post-container">
-      {isMember && (
-      <form
-        action={async (formData) => {
-          await handleDescription(formData);
-        }}
-      >
-        <div className="post-box-container">
-          <textarea className="description-box" type="post" name="description" placeholder="Description" autoComplete="off" rows={100} maxLength={100000} value={description} onChange={(e) => setDescription(e.target.value)}/>
-          <br />
-          <button className="post-button" type="submit">Upload Description</button>
+      {isOwner ? (
+        <div>
+        <form
+          action={async (formData) => {
+            await handleDescription(formData);
+          }}
+        >
+          <div className="post-box-container">
+            <textarea className="description-box" type="post" name="description" placeholder="Description" autoComplete="off" rows={100} maxLength={100000} value={description} onChange={(e) => setDescription(e.target.value)}/>
+            <br />
+            <button className="post-button" type="submit">Upload Description</button>
+          </div>
+        </form>
         </div>
-      </form>
+      ) : isMember ? (
+        <div className='post-list'>
+          <div className="post" key={description}>
+            <div className="post-content" dangerouslySetInnerHTML={createMarkup(description)} />
+          </div>
+        </div>
+      ) : (
+        <p></p>
       )}
     </div>
   );

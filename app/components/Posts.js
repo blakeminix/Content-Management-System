@@ -14,6 +14,8 @@ export function Posts() {
   const postListRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [isMember, setIsMember] = useState(false);
+  const [isModerator, setIsModerator] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     const getGroupAndCheckMembership = async () => {
@@ -52,9 +54,17 @@ export function Posts() {
         }
 
         const membershipData = await membershipResponse.json();
-        if (!membershipData.result) {
+        if (!membershipData.isMember) {
           router.push(`/groups/${gid}/join-group`);
           return;
+        }
+
+        if (membershipData.isOwner) {
+          setIsOwner(true);
+        }
+
+        if (membershipData.isModerator) {
+          setIsModerator(true);
         }
 
         await fetchPosts(gid);
@@ -163,7 +173,9 @@ export function Posts() {
                 <div className="post-username">{post.created_at}</div>
                 <div className="post-content" dangerouslySetInnerHTML={createMarkup(post.content)} />
                 <br />
-                <button onClick={() => deletePost(post.id)} className="delete-button">Delete</button>
+                {(isOwner || (isModerator && !post.isModerator) || post.isMe) && (
+                  <button onClick={() => deletePost(post.id)} className="delete-button">Delete</button>
+                )}
               </div>
             ))
           ) : (

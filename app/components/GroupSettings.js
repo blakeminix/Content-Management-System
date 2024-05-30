@@ -48,7 +48,7 @@ export function GroupSettings() {
         }
 
         const membershipData = await membershipResponse.json();
-        if (!membershipData.result) {
+        if (!membershipData.isMember) {
           router.push(`/groups/${gid}/join-group`);
           return;
         }
