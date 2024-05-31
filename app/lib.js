@@ -230,12 +230,23 @@ export async function checkMembership(gid) {
 export async function checkProfile(user) {
   const connection = await pool.getConnection();
   try {
+    const session = cookies().get("session")?.value;
+    if (!session) return;
+
+    const parsed = await decrypt(session);
+    const username = parsed.user.username;
+    let isMe = false;
+
+    if (user == username) {
+      isMe = true;
+    }
+
     const [userRow] = await connection.query('SELECT * FROM users WHERE username = ?', [user]);
 
     if (userRow.length === 0) {
-      return false;
+      return { result: false, isMe: isMe };
     }
-    return true;
+    return { result: true, isMe: isMe };
   } finally {
     connection.destroy();
   }
@@ -813,10 +824,10 @@ export async function getUserGroups() {
   }
 }
 
-export async function addProfileDescription(username) {
+export async function addProfileDescription(description, username) {
   const connection = await pool.getConnection();
   try {
-    await connection.query('UPDATE users SET description = ? WHERE username = ?', [username]);
+    await connection.query('UPDATE users SET description = ? WHERE username = ?', [description, username]);
   } finally {
     connection.destroy();
   }
@@ -825,7 +836,11 @@ export async function addProfileDescription(username) {
 export async function getProfileDescription(username) {
   const connection = await pool.getConnection();
   try {
-    const description = await connection.query('SELECT description FROM users WHERE username = ?', [username]);
+    let description = await connection.query('SELECT description FROM users WHERE username = ?', [username]);
+    
+    if (!description || description == null) {
+      description = '';
+    }
 
     return description;
   } finally {
