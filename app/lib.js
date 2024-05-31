@@ -105,6 +105,14 @@ export async function signup(formData) {
     const password = formData.get("password");
     const repeatPassword = formData.get('repeatPassword');
 
+    const usernameRegex = /^[A-Za-z0-9]+$/;
+    const passwordRegex = /^\S*$/;
+
+    if (!usernameRegex.test(name) || !passwordRegex.test(password)) {
+      redirect('/signup');
+      return;
+    }
+
     const [row] = await connection.query('SELECT username FROM users WHERE username = ?', [name]);
     const storedUsername = row[0]?.username;
 
@@ -786,6 +794,48 @@ export async function getUserGroups() {
     const parsed = await decrypt(session);
     const username = parsed.user.username;
 
+    let groupsArray = [];
+
+    const [groupRow] = await connection.query('SELECT JSON_EXTRACT(`groups`, "$[*]") AS `groups` FROM users WHERE username = ?', [username])
+    const groups = groupRow[0].groups;
+
+    if (!groups) {
+      return groupsArray;
+    }
+
+    for (const group of groups) {
+      const [groupR] = await connection.query('SELECT * FROM `groups` WHERE id = ?', [group]);
+      groupsArray.push(groupR[0]);
+    }
+    return groupsArray;
+  } finally {
+    connection.destroy();
+  }
+}
+
+export async function addProfileDescription(username) {
+  const connection = await pool.getConnection();
+  try {
+    await connection.query('UPDATE users SET description = ? WHERE username = ?', [username]);
+  } finally {
+    connection.destroy();
+  }
+}
+
+export async function getProfileDescription(username) {
+  const connection = await pool.getConnection();
+  try {
+    const description = await connection.query('SELECT description FROM users WHERE username = ?', [username]);
+
+    return description;
+  } finally {
+    connection.destroy();
+  }
+}
+
+export async function getProfileGroups(username) {
+  const connection = await pool.getConnection();
+  try {
     let groupsArray = [];
 
     const [groupRow] = await connection.query('SELECT JSON_EXTRACT(`groups`, "$[*]") AS `groups` FROM users WHERE username = ?', [username])

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { logout, getSession, deleteGroup } from '../lib'
 import { redirect } from 'next/navigation';
+import { ProfileDropdown } from '../components/ProfileDropdown';
 
 export const metadata = {
   title: "User Not Found | CMS",
@@ -17,6 +18,11 @@ export default async function Page() {
 
   return (
     <div className='centered'>
+      <div className="top-bar">
+        <Link href="/dashboard">Dashboard</Link>
+        <Link href="/creategroup">Create Group</Link>
+        <ProfileDropdown />
+      </div>
       <div className='not-found-container'>
         <h1>User Not Found</h1>
         <Link href='/dashboard' className='dashboard-link'>Back to Dashboard</Link>
