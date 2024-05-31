@@ -54,34 +54,36 @@ export async function decrypt(input) {
 export async function login(formData) {
   const connection = await pool.getConnection();
   try {
-  const name = formData.get("username");
-  const password = formData.get("password");
+    const name = formData.get("username");
+    const password = formData.get("password");
 
-  const [row] = await connection.query('SELECT password FROM users WHERE username = ?', [name]);
-  const storedPassword = row[0]?.password;
+    const [row] = await connection.query('SELECT password FROM users WHERE username = ?', [name]);
+    const storedPassword = row[0]?.password;
 
-  let passwordMatch = false;
+    const [deletedRow] = await connection.query('SELECT isDeleted FROM users WHERE username = ?', [name]);
+    const isDeleted = deletedRow[0].isDeleted;
 
-  if (password != null && storedPassword != null) {
-    passwordMatch = await verifyPassword(password, storedPassword);
-  }
+    let passwordMatch = false;
 
-  if (passwordMatch) {
-    const user = { username: name, sid: v4() };
+    if (!isDeleted && password != null && storedPassword != null) {
+      passwordMatch = await verifyPassword(password, storedPassword);
+    }
 
-    // Create the session
-    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-    const session = await encrypt({ user, expires });
+    if (passwordMatch) {
+      const user = { username: name, sid: v4() };
 
-    // Save the session in a cookie
-    cookies().set("session", session, { expires, httpOnly: true });
-    redirect('/dashboard');
-  } else {
-    console.log('Incorrect Password');
-    redirect('/.');
-  }
+      // Create the session
+      const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      const session = await encrypt({ user, expires });
+
+      // Save the session in a cookie
+      cookies().set("session", session, { expires, httpOnly: true });
+      redirect('/dashboard');
+    } else {
+      redirect('/.');
+    }
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
@@ -99,60 +101,68 @@ export async function getSession() {
 export async function signup(formData) {
   const connection = await pool.getConnection();
   try {
-  const name = formData.get("username");
-  const password = formData.get("password");
-  const repeatPassword = formData.get('repeatPassword');
+    const name = formData.get("username");
+    const password = formData.get("password");
+    const repeatPassword = formData.get('repeatPassword');
 
-  const [row] = await connection.query('SELECT username FROM users WHERE username = ?', [name]);
-  const storedUsername = row[0]?.username;
+    const usernameRegex = /^[A-Za-z0-9]+$/;
+    const passwordRegex = /^\S*$/;
 
-  if (storedUsername != name) {
-    if (password == repeatPassword && name != null && password != null && repeatPassword != null && name.length >= 3 && password.length >= 5 && name.length && name.length <= 30 && password.length <= 44) {
-      const hashedPassword = await hashPassword(password);
+    if (!usernameRegex.test(name) || !passwordRegex.test(password)) {
+      redirect('/signup');
+      return;
+    }
 
-      await connection.query('INSERT INTO users (username, password) VALUES (?, ?)', [name, hashedPassword]);
+    const [row] = await connection.query('SELECT username FROM users WHERE username = ?', [name]);
+    const storedUsername = row[0]?.username;
 
-      const user = { username: name, sid: v4() };
+    if (storedUsername != name) {
+      if (password == repeatPassword && name != null && password != null && repeatPassword != null && name.length >= 3 && password.length >= 5 && name.length && name.length <= 30 && password.length <= 44) {
+        const hashedPassword = await hashPassword(password);
 
-      // Create the session
-      const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-      const session = await encrypt({ user, expires });
+        await connection.query('INSERT INTO users (username, password) VALUES (?, ?)', [name, hashedPassword]);
 
-      // Save the session in a cookie
-      cookies().set("session", session, { expires, httpOnly: true });
-      redirect('/dashboard');
+        const user = { username: name, sid: v4() };
+
+        // Create the session
+        const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+        const session = await encrypt({ user, expires });
+
+        // Save the session in a cookie
+        cookies().set("session", session, { expires, httpOnly: true });
+        redirect('/dashboard');
+      } else {
+        console.log('Invalid Password or Username')
+        redirect('/signup');
+      }
     } else {
-      console.log('Invalid Password or Username')
+      console.log('Username Taken');
       redirect('/signup');
     }
-  } else {
-    console.log('Username Taken');
-    redirect('/signup');
+  } finally {
+    connection.destroy();
   }
-} finally {
-  connection.release();
-}
 }
 
 export async function addDescription(description, gid) {
   const connection = await pool.getConnection();
   try {
-  await connection.query('DELETE FROM description WHERE group_id = ?', [gid]);
+    await connection.query('DELETE FROM description WHERE group_id = ?', [gid]);
 
-  await connection.query('INSERT INTO description (group_id, text) VALUES (?, ?)', [gid, description]);
+    await connection.query('INSERT INTO description (group_id, text) VALUES (?, ?)', [gid, description]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
 export async function getDescription(gid) {
   const connection = await pool.getConnection();
   try {
-  const description = await connection.query('SELECT text FROM description WHERE group_id = ?', [gid]);
+    const description = await connection.query('SELECT text FROM description WHERE group_id = ?', [gid]);
 
-  return description;
+    return description;
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
@@ -170,474 +180,490 @@ export async function checkGroup(gid) {
     console.error('Error checking group:', err);
     throw err;
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
 export async function checkMembership(gid) {
   const connection = await pool.getConnection();
   try {
-  const session = cookies().get("session")?.value;
-  if (!session) return;
+    const session = cookies().get("session")?.value;
+    if (!session) return;
 
-  const parsed = await decrypt(session);
-  const username = parsed.user.username;
+    const parsed = await decrypt(session);
+    const username = parsed.user.username;
 
-  const [usersRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
+    const [usersRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
 
-  const [owner] = await connection.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
-  let isOwner = false;
+    const [owner] = await connection.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
+    let isOwner = false;
 
-  if (username == owner[0].owner_username) {
-    isOwner = true;
-  }
-
-  const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
-  const moderators = mods[0].moderators;
-  let isModerator = false;
-
-  for (const mod of moderators) {
-    if (mod == username) {
-      isModerator = true;
+    if (username == owner[0].owner_username) {
+      isOwner = true;
     }
-  }
 
-  if (usersRow.length === 0) {
+    const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
+    const moderators = mods[0].moderators;
+    let isModerator = false;
+
+    for (const mod of moderators) {
+      if (mod == username) {
+        isModerator = true;
+      }
+    }
+
+    if (usersRow.length === 0) {
+      return { isMember: false, isOwner, isModerator };
+    }
+
+    for (const usern of usersRow[0].users_in_group) {
+      if (username == usern) {
+        return { isMember: true, isOwner, isModerator };
+      }
+    }
     return { isMember: false, isOwner, isModerator };
+  } finally {
+    connection.destroy();
   }
-
-  for (const usern of usersRow[0].users_in_group) {
-    if (username == usern) {
-      return { isMember: true, isOwner, isModerator };
-    }
-  }
-  return { isMember: false, isOwner, isModerator };
-} finally {
-  connection.release();
-}
 }
 
 export async function checkProfile(user) {
   const connection = await pool.getConnection();
   try {
-  const [userRow] = await connection.query('SELECT * FROM users WHERE username = ?', [user]);
+    const session = cookies().get("session")?.value;
+    if (!session) return;
 
-  if (userRow.length === 0) {
-    return false;
+    const parsed = await decrypt(session);
+    const username = parsed.user.username;
+    let isMe = false;
+
+    if (user == username) {
+      isMe = true;
+    }
+
+    const [userRow] = await connection.query('SELECT * FROM users WHERE username = ?', [user]);
+
+    if (userRow.length === 0) {
+      return { result: false, isMe: isMe };
+    }
+    return { result: true, isMe: isMe };
+  } finally {
+    connection.destroy();
   }
-  return true;
-} finally {
-  connection.release();
-}
 }
 
 export async function getPrivacy(gid) {
   const connection = await pool.getConnection();
   try {
-  const isPriv = await connection.query('SELECT is_request_to_join FROM `groups` WHERE id = ?', [gid]);
-  if (isPriv[0][0].is_request_to_join) {
-    return true;
-  } else {
-    return false;
+    const isPriv = await connection.query('SELECT is_request_to_join FROM `groups` WHERE id = ?', [gid]);
+    if (isPriv[0][0].is_request_to_join) {
+      return true;
+    } else {
+      return false;
+    }
+  } finally {
+    connection.destroy();
   }
-} finally {
-  connection.release();
-}
 }
 
 export async function getIsRequested(gid) {
   const connection = await pool.getConnection();
   try {
-  const session = cookies().get("session")?.value;
-  if (!session) return;
+    const session = cookies().get("session")?.value;
+    if (!session) return;
 
-  const parsed = await decrypt(session);
-  const username = parsed.user.username;
+    const parsed = await decrypt(session);
+    const username = parsed.user.username;
 
-  const isReq = await connection.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
+    const isReq = await connection.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
 
-  if (!isReq || !isReq[0] || !isReq[0][0] || !isReq[0][0].requests) {
-    return false;
-  }
-
-  for (const req of isReq[0][0].requests) {
-    if (req == username) {
-      return true;
+    if (!isReq || !isReq[0] || !isReq[0][0] || !isReq[0][0].requests) {
+      return false;
     }
+
+    for (const req of isReq[0][0].requests) {
+      if (req == username) {
+        return true;
+      }
+    }
+    return false;
+  } finally {
+    connection.destroy();
   }
-  return false;
-} finally {
-  connection.release();
-}
 }
 
 export async function joinGroup(groupID) {
   const connection = await pool.getConnection();
   try {
-  const session = cookies().get("session")?.value;
-  if (!session) return;
+    const session = cookies().get("session")?.value;
+    if (!session) return;
 
-  const parsed = await decrypt(session);
-  const username = parsed.user.username;
+    const parsed = await decrypt(session);
+    const username = parsed.user.username;
 
-  const gid = parseInt(groupID, 10);
+    const gid = parseInt(groupID, 10);
 
-  const [userRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
-  let userGroups = userRow[0]?.groups;
+    const [userRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
+    let userGroups = userRow[0]?.groups;
 
-  if (!userGroups) {
-    userGroups = [];
+    if (!userGroups) {
+      userGroups = [];
+    }
+
+    userGroups.push(gid);
+    await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), username]);
+
+    const [groupRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
+    let users = groupRow[0]?.users_in_group;
+
+    if (!users) {
+      users = [];
+    }
+
+    users.push(username);
+    await connection.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
+  } finally {
+    connection.destroy();
   }
-
-  userGroups.push(gid);
-  await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), username]);
-
-  const [groupRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
-  let users = groupRow[0]?.users_in_group;
-
-  if (!users) {
-    users = [];
-  }
-
-  users.push(username);
-  await connection.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
-} finally {
-  connection.release();
-}
 }
 
 export async function leaveGroup(groupID) {
   const connection = await pool.getConnection();
   try {
-  const session = cookies().get("session")?.value;
-  if (!session) return;
+    const session = cookies().get("session")?.value;
+    if (!session) return;
 
-  const parsed = await decrypt(session);
-  const username = parsed.user.username;
+    const parsed = await decrypt(session);
+    const username = parsed.user.username;
 
-  const gid = parseInt(groupID, 10);
+    const gid = parseInt(groupID, 10);
 
-  const [userRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
-  let userGroups = userRow[0]?.groups || [];
+    const [userRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
+    let userGroups = userRow[0]?.groups || [];
 
-  userGroups = userGroups.filter(group => group !== gid);
-  await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), username]);
+    userGroups = userGroups.filter(group => group !== gid);
+    await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), username]);
 
-  const [groupRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
-  let users = groupRow[0]?.users_in_group || [];
+    const [groupRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
+    let users = groupRow[0]?.users_in_group || [];
+    users = users.filter(user => user !== username);
 
-  users = users.filter(user => user !== username);
-  await connection.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
+    const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
+    let moderators = mods[0].moderators;
+    moderators = moderators.filter(mod => mod !== username);
+
+    await connection.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
+    await connection.query('UPDATE `groups` SET moderators = ? WHERE id = ?', [JSON.stringify(moderators), gid]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
 export async function requestToJoin(gid) {
   const connection = await pool.getConnection();
   try {
-  const session = cookies().get("session")?.value;
-  if (!session) return;
+    const session = cookies().get("session")?.value;
+    if (!session) return;
 
-  const parsed = await decrypt(session);
-  const username = parsed.user.username;
+    const parsed = await decrypt(session);
+    const username = parsed.user.username;
 
-  const [requestRow] = await connection.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
-  let requests = requestRow[0]?.requests;
+    const [requestRow] = await connection.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
+    let requests = requestRow[0]?.requests;
 
-  if (!requests) {
-    requests = []
+    if (!requests) {
+      requests = []
+    }
+
+    requests.push(username);
+    await connection.query('UPDATE `groups` SET requests = ? WHERE id = ?', [JSON.stringify(requests), gid]);
+  } finally {
+    connection.destroy();
   }
-
-  requests.push(username);
-  await connection.query('UPDATE `groups` SET requests = ? WHERE id = ?', [JSON.stringify(requests), gid]);
-} finally {
-  connection.release();
-}
 }
 
 export async function cancelRequest(gid) {
   const connection = await pool.getConnection();
   try {
-  const session = cookies().get("session")?.value;
-  if (!session) return;
+    const session = cookies().get("session")?.value;
+    if (!session) return;
 
-  const parsed = await decrypt(session);
-  const username = parsed.user.username;
+    const parsed = await decrypt(session);
+    const username = parsed.user.username;
 
-  const [requestRow] = await connection.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
-  let requests = requestRow[0]?.requests;
+    const [requestRow] = await connection.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
+    let requests = requestRow[0]?.requests;
 
-  if (!requests) {
-    requests = [];
+    if (!requests) {
+      requests = [];
+    }
+
+    requests = requests.filter(user => user !== username);
+
+    await connection.query('UPDATE `groups` SET requests = ? WHERE id = ?', [JSON.stringify(requests), gid]);
+  } finally {
+    connection.destroy();
   }
-
-  requests = requests.filter(user => user !== username);
-
-  await connection.query('UPDATE `groups` SET requests = ? WHERE id = ?', [JSON.stringify(requests), gid]);
-} finally {
-  connection.release();
-}
 }
 
 export async function storePost(post, gid) {
   const connection = await pool.getConnection();
   try {
-  const session = cookies().get("session")?.value;
-  if (!session) return;
+    const session = cookies().get("session")?.value;
+    if (!session) return;
 
-  const parsed = await decrypt(session);
-  const username = parsed.user.username;
+    const parsed = await decrypt(session);
+    const username = parsed.user.username;
 
-  await connection.query('INSERT INTO posts (username, group_id, content) VALUES (?, ?, ?)', [username, gid, post]);
+    await connection.query('INSERT INTO posts (username, group_id, content) VALUES (?, ?, ?)', [username, gid, post]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
 export async function deletePost(id) {
   const connection = await pool.getConnection();
   try {
-  await connection.query('DELETE FROM posts WHERE id = ?', [id]);
+    await connection.query('DELETE FROM posts WHERE id = ?', [id]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
 export async function getPosts(gid) {
   const connection = await pool.getConnection();
   try {
-  const session = cookies().get("session")?.value;
-  if (!session) return;
+    const session = cookies().get("session")?.value;
+    if (!session) return;
 
-  const parsed = await decrypt(session);
-  const username = parsed.user.username;
+    const parsed = await decrypt(session);
+    const username = parsed.user.username;
 
-  const postArray = [];
-  const [postsRow] = await connection.query('SELECT * FROM posts WHERE group_id = ?', [gid]);
+    const postArray = [];
+    const [postsRow] = await connection.query('SELECT * FROM posts WHERE group_id = ?', [gid]);
 
-  const [ownerRow] = await connection.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
-  const owner = ownerRow[0].owner_username;
+    const [ownerRow] = await connection.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
+    const owner = ownerRow[0].owner_username;
 
-  const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
-  const moderators = mods[0].moderators;
+    const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
+    const moderators = mods[0].moderators;
 
-  for (let post of postsRow) {
-    let isOwner = false;
-    let isModerator = false;
-    let isMe = false;
-    if (post.username == owner) {
-      isOwner = true;
-    }
-
-    for (const mod of moderators) {
-      if (post.username == mod) {
-        isModerator = true;
+    for (let post of postsRow) {
+      let isOwner = false;
+      let isModerator = false;
+      let isMe = false;
+      if (post.username == owner) {
+        isOwner = true;
       }
-    }
 
-    if (post.username == username) {
-      isMe = true;
-    }
+      for (const mod of moderators) {
+        if (post.username == mod) {
+          isModerator = true;
+        }
+      }
 
-    post = {
-      id: post.id,
-      group_id: post.group_id,
-      content: post.content,
-      created_at: post.created_at,
-      username: post.username,
-      isMe: isMe,
-      isModerator: isModerator,
-      isOwner: isOwner
-    };
-    postArray.push(post);
+      if (post.username == username) {
+        isMe = true;
+      }
+
+      post = {
+        id: post.id,
+        group_id: post.group_id,
+        content: post.content,
+        created_at: post.created_at,
+        username: post.username,
+        isMe: isMe,
+        isModerator: isModerator,
+        isOwner: isOwner
+      };
+      postArray.push(post);
+    }
+    return postArray;
+  } finally {
+    connection.destroy();
   }
-  return postArray;
-} finally {
-  connection.release();
-}
 }
 
 export async function mediaUpload(filename, fileData, type, mime_type, file_size, gid) {
   const connection = await pool.getConnection();
   try {
-  const session = cookies().get("session")?.value;
-  if (!session) return;
+    const session = cookies().get("session")?.value;
+    if (!session) return;
 
-  const parsed = await decrypt(session);
-  const username = parsed.user.username;
+    const parsed = await decrypt(session);
+    const username = parsed.user.username;
 
-  const base64Image = fileData.split(';base64,').pop();
-  const buffer = Buffer.from(base64Image, 'base64');
+    const base64Image = fileData.split(';base64,').pop();
+    const buffer = Buffer.from(base64Image, 'base64');
   
-  await connection.query('INSERT INTO media (filename, file_data, type, mime_type, file_size, username, group_id) VALUES (?, ?, ?, ?, ?, ?, ?)', [filename, buffer, type, mime_type, file_size, username, gid]);
+    await connection.query('INSERT INTO media (filename, file_data, type, mime_type, file_size, username, group_id) VALUES (?, ?, ?, ?, ?, ?, ?)', [filename, buffer, type, mime_type, file_size, username, gid]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
 export async function deleteMedia(mediaid) {
   const connection = await pool.getConnection();
   try {
-  await connection.query('DELETE from media WHERE id = ?', [mediaid]);
+    await connection.query('DELETE from media WHERE id = ?', [mediaid]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
 export async function getMedia(gid) {
   const connection = await pool.getConnection();
   try {
-  const session = cookies().get("session")?.value;
-  if (!session) return;
+    const session = cookies().get("session")?.value;
+    if (!session) return;
 
-  const parsed = await decrypt(session);
-  const username = parsed.user.username;
+    const parsed = await decrypt(session);
+    const username = parsed.user.username;
 
-  const mediaArray = [];
-  const [mediaRow] = await connection.query('SELECT * FROM media WHERE group_id = ?', [gid]);
+    const mediaArray = [];
+    const [mediaRow] = await connection.query('SELECT * FROM media WHERE group_id = ?', [gid]);
 
-  const [ownerRow] = await connection.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
-  const owner = ownerRow[0].owner_username;
+    const [ownerRow] = await connection.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
+    const owner = ownerRow[0].owner_username;
 
-  const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
-  const moderators = mods[0].moderators;
+    const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
+    const moderators = mods[0].moderators;
 
-  for (let media of mediaRow) {
-    let isOwner = false;
-    let isModerator = false;
-    let isMe = false;
-    if (media.username == owner) {
-      isOwner = true;
-    }
-
-    for (const mod of moderators) {
-      if (media.username == mod) {
-        isModerator = true;
+    for (let media of mediaRow) {
+      let isOwner = false;
+      let isModerator = false;
+      let isMe = false;
+      if (media.username == owner) {
+        isOwner = true;
       }
+
+      for (const mod of moderators) {
+        if (media.username == mod) {
+          isModerator = true;
+        }
+      }
+
+      if (media.username == username) {
+        isMe = true;
+      }
+
+      media = {
+        id: media.id,
+        filename: media.filename,
+        file_data: media.file_data,
+        type: media.type,
+        mime_type: media.mime_type,
+        file_size: media.file_size,
+        width: media.width,
+        height: media.height,
+        duration: media.duration,
+        uploaded_at: media.uploaded_at,
+        description: media.description,
+        username: media.username,
+        group_id: media.group_id,
+        isMe: isMe,
+        isModerator: isModerator,
+        isOwner: isOwner
+      };
+      mediaArray.push(media);
     }
 
-    if (media.username == username) {
-      isMe = true;
-    }
-
-    media = {
-      id: media.id,
-      filename: media.filename,
-      file_data: media.file_data,
-      type: media.type,
-      mime_type: media.mime_type,
-      file_size: media.file_size,
-      width: media.width,
-      height: media.height,
-      duration: media.duration,
-      uploaded_at: media.uploaded_at,
-      description: media.description,
-      username: media.username,
-      group_id: media.group_id,
-      isMe: isMe,
-      isModerator: isModerator,
-      isOwner: isOwner
-    };
-    mediaArray.push(media);
+    return mediaArray;
+  } finally {
+    connection.destroy();
   }
-
-  return mediaArray;
-} finally {
-  connection.release();
-}
 }
 
 export async function getUsers(gid) {
   const connection = await pool.getConnection();
   try {
-  const session = cookies().get("session")?.value;
-  if (!session) return;
+    const session = cookies().get("session")?.value;
+    if (!session) return;
 
-  const parsed = await decrypt(session);
-  const username = parsed.user.username;
+    const parsed = await decrypt(session);
+    const username = parsed.user.username;
 
-  const userArray = [];
-  const [userRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
-  const users = userRow[0].users_in_group;
+    const userArray = [];
+    const [userRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
+    const users = userRow[0].users_in_group;
 
-  const [ownerRow] = await connection.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
-  const owner = ownerRow[0].owner_username;
+    const [ownerRow] = await connection.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
+    const owner = ownerRow[0].owner_username;
 
-  const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
-  const moderators = mods[0].moderators;
+    const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
+    const moderators = mods[0].moderators;
 
-  for (const user of users) {
-    let isOwner = false;
-    let isModerator = false;
-    let isMe = false;
-    if (user == owner) {
-      isOwner = true;
-    }
-
-    for (const mod of moderators) {
-      if (user == mod) {
-        isModerator = true;
+    for (const user of users) {
+      let isOwner = false;
+      let isModerator = false;
+      let isMe = false;
+      if (user == owner) {
+        isOwner = true;
       }
+
+      for (const mod of moderators) {
+        if (user == mod) {
+          isModerator = true;
+        }
+      }
+
+      if (user == username) {
+        isMe = true;
+      }
+
+      const userObject = {
+        username: user,
+        isMe: isMe,
+        isOwner: isOwner,
+        isModerator: isModerator
+      };
+      userArray.push(userObject);
     }
 
-    if (user == username) {
-      isMe = true;
-    }
-
-    const userObject = {
-      username: user,
-      isMe: isMe,
-      isOwner: isOwner,
-      isModerator: isModerator
-    };
-    userArray.push(userObject);
+    return userArray;
+  } finally {
+    connection.destroy();
   }
-
-  return userArray;
-} finally {
-  connection.release();
-}
 }
 
 export async function getRequests(gid) {
   const connection = await pool.getConnection();
   try {
-  const [reqRow] = await connection.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
-  const req = reqRow[0].requests;
-  return req;
+    const [reqRow] = await connection.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
+    const req = reqRow[0].requests;
+    return req;
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
 export async function acceptRequest(groupID, accept, user) {
   const connection = await pool.getConnection();
   try {
-  const gid = parseInt(groupID, 10);
+    const gid = parseInt(groupID, 10);
 
-  const [reqRow] = await connection.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
-  let requests = reqRow[0].requests;
+    const [reqRow] = await connection.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
+    let requests = reqRow[0].requests;
 
-  const [userRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
-  let users = userRow[0].users_in_group;
+    const [userRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
+    let users = userRow[0].users_in_group;
 
-  const [groupRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [user]);
-  let userGroups = groupRow[0].groups;
+    const [groupRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [user]);
+    let userGroups = groupRow[0].groups;
 
-  requests = requests.filter(request => request !== user);
+    requests = requests.filter(request => request !== user);
   
-  if (accept) {
-    users.push(user);
-    userGroups.push(gid);
-  }
+    if (accept) {
+      users.push(user);
+      userGroups.push(gid);
+    }
 
-  await connection.query('UPDATE `groups` SET requests = ? WHERE id = ?', [JSON.stringify(requests), gid]);
-  await connection.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
-  await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), user]);
-} finally {
-  connection.release();
-}
+    await connection.query('UPDATE `groups` SET requests = ? WHERE id = ?', [JSON.stringify(requests), gid]);
+    await connection.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
+    await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), user]);
+  } finally {
+    connection.destroy();
+  }
 }
 
 export async function handleMod(gid, user) {
@@ -654,7 +680,7 @@ export async function handleMod(gid, user) {
 
     await connection.query('UPDATE `groups` SET moderators = ? WHERE id = ?', [JSON.stringify(moderators), gid]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
@@ -672,138 +698,192 @@ export async function removeMod(gid, user) {
 
     await connection.query('UPDATE `groups` SET moderators = ? WHERE id = ?', [JSON.stringify(moderators), gid]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
 export async function kickUser(groupID, user) {
   const connection = await pool.getConnection();
   try {
-  const gid = parseInt(groupID, 10);
+    const gid = parseInt(groupID, 10);
 
-  const [userRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
-  let users = userRow[0].users_in_group;
+    const [userRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
+    let users = userRow[0].users_in_group;
 
-  const [groupRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [user]);
-  let userGroups = groupRow[0].groups;
+    const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
+    let moderators = mods[0].moderators || [];
 
-  users = users.filter(username => username !== user);
-  userGroups = userGroups.filter(group => group !== gid);
+    const [groupRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [user]);
+    let userGroups = groupRow[0].groups;
 
-  await connection.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
-  await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), user]);
+    users = users.filter(username => username !== user);
+    moderators = moderators.filter(username => username !== user);
+    userGroups = userGroups.filter(group => group !== gid);
+
+    await connection.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
+    await connection.query('UPDATE `groups` SET moderators = ? WHERE id = ?', [JSON.stringify(moderators), gid]);
+    await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), user]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
 export async function createGroup(formData) {
-  const connection = await connection.getConnection();
+  const connection = await pool.getConnection();
   try {
-  const session = cookies().get("session")?.value;
-  if (!session) return;
+    const session = cookies().get("session")?.value;
+    if (!session) return;
 
-  const parsed = await decrypt(session);
-  const username = parsed.user.username;
+    const parsed = await decrypt(session);
+    const username = parsed.user.username;
 
-  const group_name = formData.get("group_name");
+    const group_name = formData.get("group_name");
 
-  let users = [];
-  users.push(username);
+    let users = [];
+    users.push(username);
 
-  let is_public = false;
-  let is_request_to_join = false;
+    let is_public = false;
+    let is_request_to_join = false;
 
-  if (formData.get("is_public") == "public") {
-    is_public = true;
-  } else {
-    is_request_to_join = true;
+    if (formData.get("is_public") == "public") {
+      is_public = true;
+    } else {
+      is_request_to_join = true;
+    }
+    const uniqueid = v4();
+
+    await connection.query('INSERT INTO `groups` (group_name, users_in_group, moderators, owner_username, is_request_to_join, is_public, uuid) VALUES (?, ?, ?, ?, ?, ?, ?)', [group_name, JSON.stringify(users), JSON.stringify(users), username, is_request_to_join, is_public, uniqueid]);
+
+    const [row] = await connection.query('SELECT id FROM `groups` WHERE uuid = ?', [uniqueid]);
+    const storedID = row[0]?.id;
+
+    const [userRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
+    let userGroups = userRow[0]?.groups;
+
+    if (!userGroups) {
+      userGroups = [];
+    }
+
+    userGroups.push(storedID);
+    await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), username]);
+
+    return storedID;
+  } finally {
+    connection.destroy();
   }
-  const uniqueid = v4();
-
-  await connection.query('INSERT INTO `groups` (group_name, users_in_group, moderators, owner_username, is_request_to_join, is_public, uuid) VALUES (?, ?, ?, ?, ?, ?, ?)', [group_name, JSON.stringify(users), JSON.stringify(users), username, is_request_to_join, is_public, uniqueid]);
-
-  const [row] = await connection.query('SELECT id FROM `groups` WHERE uuid = ?', [uniqueid]);
-  const storedID = row[0]?.id;
-
-  const [userRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
-  let userGroups = userRow[0]?.groups;
-
-  if (!userGroups) {
-    userGroups = [];
-  }
-
-  userGroups.push(storedID);
-  await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), username]);
-
-  return storedID;
-} finally {
-  connection.release();
-}
 }
 
 export async function deleteGroup(gid) {
   const connection = await pool.getConnection();
   try {
-  const [groupRow] = await connection.query('SELECT JSON_EXTRACT(users_in_group, "$[*]") AS users_in_group FROM `groups` WHERE id = ?', [gid]);
-  const usersArray = groupRow[0].users_in_group;
+    const [groupRow] = await connection.query('SELECT JSON_EXTRACT(users_in_group, "$[*]") AS users_in_group FROM `groups` WHERE id = ?', [gid]);
+    const usersArray = groupRow[0].users_in_group;
 
-  for (const username of usersArray) {
-    const [userRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
-    let userGroups = userRow[0].groups;
-    let newArray = userGroups.filter(id => id != gid);
+    for (const username of usersArray) {
+      const [userRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
+      let userGroups = userRow[0].groups;
+      let newArray = userGroups.filter(id => id != gid);
 
-    await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(newArray), username]);
+      await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(newArray), username]);
+    }
+
+    await connection.query('DELETE FROM `description` WHERE group_id = ?', [gid]);
+    await connection.query('DELETE FROM `media` WHERE group_id = ?', [gid]);
+    await connection.query('DELETE FROM `posts` WHERE group_id = ?', [gid]);
+    await connection.query('DELETE FROM `groups` WHERE id = ?', [gid]);
+  } finally {
+    connection.destroy();
   }
-
-  await connection.query('DELETE FROM `groups` WHERE id = ?', [gid]);
-} finally {
-  connection.release();
-}
 }
 
 export async function getUserGroups() {
   const connection = await pool.getConnection();
   try {
-  const session = cookies().get("session")?.value;
-  if (!session) return;
+    const session = cookies().get("session")?.value;
+    if (!session) return;
 
-  const parsed = await decrypt(session);
-  const username = parsed.user.username;
+    const parsed = await decrypt(session);
+    const username = parsed.user.username;
 
-  let groupsArray = [];
+    let groupsArray = [];
 
-  const [groupRow] = await connection.query('SELECT JSON_EXTRACT(`groups`, "$[*]") AS `groups` FROM users WHERE username = ?', [username])
-  const groups = groupRow[0].groups;
+    const [groupRow] = await connection.query('SELECT JSON_EXTRACT(`groups`, "$[*]") AS `groups` FROM users WHERE username = ?', [username])
+    const groups = groupRow[0].groups;
 
-  if (!groups) {
+    if (!groups) {
+      return groupsArray;
+    }
+
+    for (const group of groups) {
+      const [groupR] = await connection.query('SELECT * FROM `groups` WHERE id = ?', [group]);
+      groupsArray.push(groupR[0]);
+    }
     return groupsArray;
+  } finally {
+    connection.destroy();
   }
-
-  for (const group of groups) {
-    const [groupR] = await connection.query('SELECT * FROM `groups` WHERE id = ?', [group]);
-    groupsArray.push(groupR[0]);
-  }
-  return groupsArray;
-} finally {
-  connection.release();
 }
+
+export async function addProfileDescription(description, username) {
+  const connection = await pool.getConnection();
+  try {
+    await connection.query('UPDATE users SET description = ? WHERE username = ?', [description, username]);
+  } finally {
+    connection.destroy();
+  }
+}
+
+export async function getProfileDescription(username) {
+  const connection = await pool.getConnection();
+  try {
+    let description = await connection.query('SELECT description FROM users WHERE username = ?', [username]);
+    
+    if (!description || description == null) {
+      description = '';
+    }
+
+    return description;
+  } finally {
+    connection.destroy();
+  }
+}
+
+export async function getProfileGroups(username) {
+  const connection = await pool.getConnection();
+  try {
+    let groupsArray = [];
+
+    const [groupRow] = await connection.query('SELECT JSON_EXTRACT(`groups`, "$[*]") AS `groups` FROM users WHERE username = ?', [username])
+    const groups = groupRow[0].groups;
+
+    if (!groups) {
+      return groupsArray;
+    }
+
+    for (const group of groups) {
+      const [groupR] = await connection.query('SELECT * FROM `groups` WHERE id = ?', [group]);
+      groupsArray.push(groupR[0]);
+    }
+    return groupsArray;
+  } finally {
+    connection.destroy();
+  }
 }
 
 export async function deleteAccount() {
   const connection = await pool.getConnection();
   try {
-  const session = cookies().get("session")?.value;
-  if (!session) return;
+    const session = cookies().get("session")?.value;
+    if (!session) return;
 
-  const parsed = await decrypt(session);
-  const username = parsed.user.username;
+    const parsed = await decrypt(session);
+    const username = parsed.user.username;
 
-  await connection.query('DELETE FROM users WHERE username = ?', [username]);
+    await connection.query('UPDATE users SET isDeleted = true WHERE username = ?', [username]);
 
-  cookies().set("session", "", { expires: new Date(0) });
+    cookies().set("session", "", { expires: new Date(0) });
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 

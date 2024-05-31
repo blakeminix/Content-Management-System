@@ -3,6 +3,7 @@ import { getSession } from '../../../lib';
 import { redirect } from 'next/navigation';
 import { ProfileDropdown } from '@/app/components/ProfileDropdown';
 import { CheckProfile } from '@/app/components/CheckProfile';
+import { Profile } from '@/app/components/Profile';
 
 export const metadata = {
   title: "Profile | CMS",
@@ -19,12 +20,12 @@ export default async function Page() {
 
   return (
     <div>
-      <CheckProfile />
       <div className="top-bar">
         <Link href="/dashboard">Dashboard</Link>
         <Link href="/creategroup">Create Group</Link>
         <ProfileDropdown />
       </div>
+      <Profile />
     </div>
   );
 }

@@ -23,13 +23,13 @@ export default async function Page() {
           await signup(formData);
         }}
       >
-        <input className="text-box" type="username" name="username" placeholder="Username" maxLength={30}/>
+        <input className="text-box" type="username" name="username" placeholder="Username" maxLength={30} autoComplete='off'/>
         <br />
         <br />
-        <input className="text-box" type="password" name="password" placeholder="Password" maxLength={44}/>
+        <input className="text-box" type="password" name="password" placeholder="Password" maxLength={44} autoComplete='off'/>
         <br />
         <br />
-        <input className="text-box" type="password" name="repeatPassword" placeholder="Repeat Password" maxLength={44}/>
+        <input className="text-box" type="password" name="repeatPassword" placeholder="Repeat Password" maxLength={44} autoComplete='off'/>
         <br />
         <br />
         <div className='border-line'></div>
