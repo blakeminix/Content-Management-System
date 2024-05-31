@@ -16,7 +16,10 @@ const pool = mysql.createPool({
   port: '3307',
   user: process.env.USER,
   password: process.env.PASSWORD,
-  database: process.env.DATABASE
+  database: process.env.DATABASE,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
 // Function to hash a password
@@ -281,6 +284,10 @@ export async function joinGroup(groupID) {
 
   const [userRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
   let userGroups = userRow[0]?.groups;
+
+  if (!userGroups) {
+    userGroups = [];
+  }
 
   userGroups.push(gid);
   await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), username]);
