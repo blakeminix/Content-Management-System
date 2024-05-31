@@ -81,7 +81,7 @@ export async function login(formData) {
     redirect('/.');
   }
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
@@ -130,7 +130,7 @@ export async function signup(formData) {
     redirect('/signup');
   }
 } finally {
-  connection.release();
+  connection.destroy();
 }
 }
 
@@ -141,18 +141,19 @@ export async function addDescription(description, gid) {
 
   await connection.query('INSERT INTO description (group_id, text) VALUES (?, ?)', [gid, description]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
 export async function getDescription(gid) {
   const connection = await pool.getConnection();
+  console.log(connection.threadId);
   try {
   const description = await connection.query('SELECT text FROM description WHERE group_id = ?', [gid]);
 
   return description;
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
@@ -170,7 +171,7 @@ export async function checkGroup(gid) {
     console.error('Error checking group:', err);
     throw err;
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
@@ -213,7 +214,7 @@ export async function checkMembership(gid) {
   }
   return { isMember: false, isOwner, isModerator };
 } finally {
-  connection.release();
+  connection.destroy();
 }
 }
 
@@ -227,7 +228,7 @@ export async function checkProfile(user) {
   }
   return true;
 } finally {
-  connection.release();
+  connection.destroy();
 }
 }
 
@@ -241,7 +242,7 @@ export async function getPrivacy(gid) {
     return false;
   }
 } finally {
-  connection.release();
+  connection.destroy();
 }
 }
 
@@ -267,7 +268,7 @@ export async function getIsRequested(gid) {
   }
   return false;
 } finally {
-  connection.release();
+  connection.destroy();
 }
 }
 
@@ -302,7 +303,7 @@ export async function joinGroup(groupID) {
   users.push(username);
   await connection.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
 } finally {
-  connection.release();
+  connection.destroy();
 }
 }
 
@@ -329,7 +330,7 @@ export async function leaveGroup(groupID) {
   users = users.filter(user => user !== username);
   await connection.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
@@ -352,7 +353,7 @@ export async function requestToJoin(gid) {
   requests.push(username);
   await connection.query('UPDATE `groups` SET requests = ? WHERE id = ?', [JSON.stringify(requests), gid]);
 } finally {
-  connection.release();
+  connection.destroy();
 }
 }
 
@@ -376,7 +377,7 @@ export async function cancelRequest(gid) {
 
   await connection.query('UPDATE `groups` SET requests = ? WHERE id = ?', [JSON.stringify(requests), gid]);
 } finally {
-  connection.release();
+  connection.destroy();
 }
 }
 
@@ -391,7 +392,7 @@ export async function storePost(post, gid) {
 
   await connection.query('INSERT INTO posts (username, group_id, content) VALUES (?, ?, ?)', [username, gid, post]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
@@ -400,7 +401,7 @@ export async function deletePost(id) {
   try {
   await connection.query('DELETE FROM posts WHERE id = ?', [id]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
@@ -454,7 +455,7 @@ export async function getPosts(gid) {
   }
   return postArray;
 } finally {
-  connection.release();
+  connection.destroy();
 }
 }
 
@@ -472,7 +473,7 @@ export async function mediaUpload(filename, fileData, type, mime_type, file_size
   
   await connection.query('INSERT INTO media (filename, file_data, type, mime_type, file_size, username, group_id) VALUES (?, ?, ?, ?, ?, ?, ?)', [filename, buffer, type, mime_type, file_size, username, gid]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
@@ -481,7 +482,7 @@ export async function deleteMedia(mediaid) {
   try {
   await connection.query('DELETE from media WHERE id = ?', [mediaid]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
@@ -544,7 +545,7 @@ export async function getMedia(gid) {
 
   return mediaArray;
 } finally {
-  connection.release();
+  connection.destroy();
 }
 }
 
@@ -596,7 +597,7 @@ export async function getUsers(gid) {
 
   return userArray;
 } finally {
-  connection.release();
+  connection.destroy();
 }
 }
 
@@ -607,7 +608,7 @@ export async function getRequests(gid) {
   const req = reqRow[0].requests;
   return req;
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
@@ -636,7 +637,7 @@ export async function acceptRequest(groupID, accept, user) {
   await connection.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
   await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), user]);
 } finally {
-  connection.release();
+  connection.destroy();
 }
 }
 
@@ -654,7 +655,7 @@ export async function handleMod(gid, user) {
 
     await connection.query('UPDATE `groups` SET moderators = ? WHERE id = ?', [JSON.stringify(moderators), gid]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
@@ -672,7 +673,7 @@ export async function removeMod(gid, user) {
 
     await connection.query('UPDATE `groups` SET moderators = ? WHERE id = ?', [JSON.stringify(moderators), gid]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
@@ -693,12 +694,12 @@ export async function kickUser(groupID, user) {
   await connection.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
   await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), user]);
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
 export async function createGroup(formData) {
-  const connection = await connection.getConnection();
+  const connection = await pool.getConnection();
   try {
   const session = cookies().get("session")?.value;
   if (!session) return;
@@ -738,7 +739,7 @@ export async function createGroup(formData) {
 
   return storedID;
 } finally {
-  connection.release();
+  connection.destroy();
 }
 }
 
@@ -758,7 +759,7 @@ export async function deleteGroup(gid) {
 
   await connection.query('DELETE FROM `groups` WHERE id = ?', [gid]);
 } finally {
-  connection.release();
+  connection.destroy();
 }
 }
 
@@ -786,7 +787,7 @@ export async function getUserGroups() {
   }
   return groupsArray;
 } finally {
-  connection.release();
+  connection.destroy();
 }
 }
 
@@ -803,7 +804,7 @@ export async function deleteAccount() {
 
   cookies().set("session", "", { expires: new Date(0) });
   } finally {
-    connection.release();
+    connection.destroy();
   }
 }
 
