@@ -57,7 +57,7 @@ export function Profile() {
 
     const getProfileGroups = async (user) => {
         try {
-          const response = await fetch('http://localhost:3000/api/getprofilegroups', {
+          const response = await fetch('/api/getprofilegroups', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -79,7 +79,7 @@ export function Profile() {
 
     const getProfileDescription = async (user) => {
         try {
-          const response = await fetch('http://localhost:3000/api/getprofiledescription', {
+          const response = await fetch('/api/getprofiledescription', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ export function Profile() {
         const user = parts[2];
         const description = formData.get('description');
         try {
-            const response = await fetch('http://localhost:3000/api/addprofiledescription', {
+            const response = await fetch('/api/addprofiledescription', {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',

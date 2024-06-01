@@ -15,7 +15,7 @@ export function DeleteGroup() {
     const parts = pathname.split("/");
     const gid = parts[2];
     try {
-      const response = await fetch('http://localhost:3000/api/deletegroup', {
+      const response = await fetch('/api/deletegroup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

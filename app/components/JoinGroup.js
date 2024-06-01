@@ -16,7 +16,7 @@ export function JoinGroup() {
         const parts = pathname.split("/");
         const gid = parts[2];
         try {
-          const response = await fetch('http://localhost:3000/api/getprivacy', {
+          const response = await fetch('/api/getprivacy', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ export function JoinGroup() {
         const parts = pathname.split("/");
         const gid = parts[2];
         try {
-          const response = await fetch('http://localhost:3000/api/getisrequested', {
+          const response = await fetch('/api/getisrequested', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ export function JoinGroup() {
         const parts = pathname.split("/");
         const gid = parts[2];
         try {
-          const response = await fetch('http://localhost:3000/api/joingroup', {
+          const response = await fetch('/api/joingroup', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ export function JoinGroup() {
       const parts = pathname.split("/");
       const gid = parts[2];
       try {
-        const response = await fetch('http://localhost:3000/api/handlerequest', {
+        const response = await fetch('/api/handlerequest', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ export function JoinGroup() {
       const parts = pathname.split("/");
       const gid = parts[2];
       try {
-        const response = await fetch('http://localhost:3000/api/cancelrequest', {
+        const response = await fetch('/api/cancelrequest', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

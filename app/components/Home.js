@@ -79,7 +79,7 @@ export function Home() {
 
   const fetchDescription = async (gid) => {
     try {
-      const response = await fetch('http://localhost:3000/api/getdescription', {
+      const response = await fetch('/api/getdescription', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ export function Home() {
     const gid = parts[2];
     const description = formData.get('description');
     try {
-      const response = await fetch('http://localhost:3000/api/adddescription', {
+      const response = await fetch('/api/adddescription', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -89,7 +89,7 @@ export function Media() {
     const parts = pathname.split("/");
     const gid = parts[2];
     try {
-      const response = await fetch('http://localhost:3000/api/getmedia', {
+      const response = await fetch('/api/getmedia', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -149,7 +149,7 @@ export function Media() {
       console.log(fileData);
 
       try {
-        const response = await fetch('http://localhost:3000/api/mediaupload', {
+        const response = await fetch('/api/mediaupload', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -173,7 +173,7 @@ export function Media() {
 
   const deleteMedia = async (mediaid) => {
     try {
-      const response = await fetch('http://localhost:3000/api/deletemedia', {
+      const response = await fetch('/api/deletemedia', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
