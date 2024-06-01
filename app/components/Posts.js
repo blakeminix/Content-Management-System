@@ -89,7 +89,7 @@ export function Posts() {
     const parts = pathname.split("/");
     const gid = parts[2];
     try {
-      const response = await fetch('http://localhost:3000/api/getposts', {
+      const response = await fetch('/api/getposts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ export function Posts() {
     const gid = parts[2];
     const post = formData.get('post');
     try {
-      const response = await fetch('http://localhost:3000/api/post', {
+      const response = await fetch('/api/post', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -135,7 +135,7 @@ export function Posts() {
 
   const deletePost = async (postid) => {
     try {
-      const response = await fetch('http://localhost:3000/api/deletepost', {
+      const response = await fetch('/api/deletepost', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

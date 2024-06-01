@@ -9,7 +9,7 @@ export async function LeaveGroup() {
         const parts = pathname.split("/");
         const gid = parts[2];
         try {
-          const response = await fetch('http://localhost:3000/api/leavegroup', {
+          const response = await fetch('/api/leavegroup', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

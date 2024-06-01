@@ -78,7 +78,7 @@ export function GroupSettings() {
     const parts = pathname.split("/");
     const gid = parts[2];
     try {
-      const response = await fetch('http://localhost:3000/api/leavegroup', {
+      const response = await fetch('/api/leavegroup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -100,7 +100,7 @@ export function GroupSettings() {
     const parts = pathname.split("/");
     const gid = parts[2];
     try {
-      const response = await fetch('http://localhost:3000/api/deletegroup', {
+      const response = await fetch('/api/deletegroup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

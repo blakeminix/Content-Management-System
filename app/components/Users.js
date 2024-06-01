@@ -81,7 +81,7 @@ export function Users() {
       const parts = pathname.split("/");
       const gid = parts[2];
       try {
-        const response = await fetch('http://localhost:3000/api/getprivacy', {
+        const response = await fetch('/api/getprivacy', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ export function Users() {
     const parts = pathname.split("/");
     const gid = parts[2];
     try {
-      const response = await fetch('http://localhost:3000/api/getusers', {
+      const response = await fetch('/api/getusers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -136,7 +136,7 @@ export function Users() {
     const parts = pathname.split("/");
     const gid = parts[2];
     try {
-      const response = await fetch('http://localhost:3000/api/getrequests', {
+      const response = await fetch('/api/getrequests', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -160,7 +160,7 @@ export function Users() {
     const parts = pathname.split("/");
     const gid = parts[2];
     try {
-      const response = await fetch('http://localhost:3000/api/acceptrequest', {
+      const response = await fetch('/api/acceptrequest', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -184,7 +184,7 @@ export function Users() {
     const parts = pathname.split("/");
     const gid = parts[2];
     try {
-      const response = await fetch('http://localhost:3000/api/handlemod', {
+      const response = await fetch('/api/handlemod', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -207,7 +207,7 @@ export function Users() {
     const parts = pathname.split("/");
     const gid = parts[2];
     try {
-      const response = await fetch('http://localhost:3000/api/removemod', {
+      const response = await fetch('/api/removemod', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -231,7 +231,7 @@ export function Users() {
     const parts = pathname.split("/");
     const gid = parts[2];
     try {
-      const response = await fetch('http://localhost:3000/api/kickuser', {
+      const response = await fetch('/api/kickuser', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
