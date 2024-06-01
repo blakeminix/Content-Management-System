@@ -13,7 +13,7 @@ const key = new TextEncoder().encode(secretKey);
 
 const pool = mysql.createPool({
   host: process.env.HOST,
-  port: '3306',
+  port: '3307',
   user: process.env.USER,
   password: process.env.PASSWORD,
   database: process.env.DATABASE,
@@ -776,7 +776,7 @@ export async function createGroup(formData) {
 export async function deleteGroup(gid) {
   const connection = await pool.getConnection();
   try {
-    const [groupRow] = await connection.query('SELECT JSON_EXTRACT(users_in_group, "$[*]") AS users_in_group FROM `groups` WHERE id = ?', [gid]);
+    const [groupRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
     const usersArray = groupRow[0].users_in_group;
 
     for (const username of usersArray) {
@@ -807,7 +807,7 @@ export async function getUserGroups() {
 
     let groupsArray = [];
 
-    const [groupRow] = await connection.query('SELECT JSON_EXTRACT(`groups`, "$[*]") AS `groups` FROM users WHERE username = ?', [username])
+    const [groupRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username])
     const groups = groupRow[0].groups;
 
     if (!groups) {
@@ -853,7 +853,7 @@ export async function getProfileGroups(username) {
   try {
     let groupsArray = [];
 
-    const [groupRow] = await connection.query('SELECT JSON_EXTRACT(`groups`, "$[*]") AS `groups` FROM users WHERE username = ?', [username])
+    const [groupRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username])
     const groups = groupRow[0].groups;
 
     if (!groups) {
