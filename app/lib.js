@@ -194,8 +194,14 @@ export async function checkMembership(gid) {
     const username = parsed.user.username;
 
     const [usersRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
+    console.log("usersRow: ", usersRow);
+    console.log("usersRow[0]: ", usersRow[0]);
+    console.log("usersRow[0].users_in_group", usersRow[0].users_in_group);
 
     const [owner] = await connection.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
+    console.log("owner: ", owner);
+    console.log("owner[0]: ", owner[0]);
+    console.log("owner[0].owner_username: ", owner[0].owner_username);
     let isOwner = false;
 
     if (username == owner[0].owner_username) {
@@ -204,6 +210,8 @@ export async function checkMembership(gid) {
 
     const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
     const moderators = mods[0].moderators;
+    console.log("mods: ", mods);
+    console.log("mods: ", moderators);
     let isModerator = false;
 
     for (const mod of moderators) {
@@ -809,8 +817,6 @@ export async function getUserGroups() {
 
     const [groupRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username])
     const groups = groupRow[0].groups;
-
-    console.log("groups: ", groups);
 
     if (!groups) {
       return groupsArray;
