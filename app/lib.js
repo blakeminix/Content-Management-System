@@ -194,14 +194,8 @@ export async function checkMembership(gid) {
     const username = parsed.user.username;
 
     const [usersRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
-    console.log("usersRow: ", usersRow);
-    console.log("usersRow[0]: ", usersRow[0]);
-    console.log("usersRow[0].users_in_group", usersRow[0].users_in_group);
 
     const [owner] = await connection.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
-    console.log("owner: ", owner);
-    console.log("owner[0]: ", owner[0]);
-    console.log("owner[0].owner_username: ", owner[0].owner_username);
     let isOwner = false;
 
     if (username == owner[0].owner_username) {
@@ -209,14 +203,11 @@ export async function checkMembership(gid) {
     }
 
     const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
-    const moderators = mods[0].moderators;
-    console.log("mods: ", mods);
-    console.log("mods: ", moderators);
+    let moderators = mods[0].moderators.replace(/[\[\]]/g, '').split(',');
     let isModerator = false;
 
     for (const mod of moderators) {
-      console.log("mod: ", mod);
-      if (mod == username) {
+      if (mod.trim() == username) {
         isModerator = true;
       }
     }
@@ -225,9 +216,9 @@ export async function checkMembership(gid) {
       return { isMember: false, isOwner, isModerator };
     }
 
-    for (const usern of usersRow[0].users_in_group) {
-      console.log("usern: ", usern);
-      if (username == usern) {
+    let usersInGroup = usersRow[0].users_in_group.replace(/[\[\]"]/g, '').split(',');
+    for (const usern of usersInGroup) {
+      if (usern.trim() == username) {
         return { isMember: true, isOwner, isModerator };
       }
     }
