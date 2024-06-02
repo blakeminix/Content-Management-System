@@ -215,6 +215,7 @@ export async function checkMembership(gid) {
     let isModerator = false;
 
     for (const mod of moderators) {
+      console.log("mod: ", mod);
       if (mod == username) {
         isModerator = true;
       }
@@ -225,6 +226,7 @@ export async function checkMembership(gid) {
     }
 
     for (const usern of usersRow[0].users_in_group) {
+      console.log("usern: ", usern);
       if (username == usern) {
         return { isMember: true, isOwner, isModerator };
       }
