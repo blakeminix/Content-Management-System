@@ -818,6 +818,8 @@ export async function getUserGroups() {
 
     for (const group of groups) {
       const [groupR] = await connection.query('SELECT * FROM `groups` WHERE id = ?', [group]);
+      console.log(groupR);
+      console.log(groupR[0]);
       groupsArray.push(groupR[0]);
     }
     console.log(groupsArray[0].id);
