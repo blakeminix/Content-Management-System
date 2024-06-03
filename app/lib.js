@@ -61,6 +61,9 @@ export async function login(formData) {
     const storedPassword = row[0]?.password;
 
     const [deletedRow] = await connection.query('SELECT isDeleted FROM users WHERE username = ?', [name]);
+    if (!deletedRow[0]) {
+      return;
+    }
     const isDeleted = deletedRow[0].isDeleted;
 
     let passwordMatch = false;
@@ -202,8 +205,15 @@ export async function checkMembership(gid) {
       isOwner = true;
     }
 
+    let moderators = [];
     const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
-    let moderators = mods[0].moderators.replace(/[\[\]]/g, '').split(',');
+    if (mods[0].moderators) {
+      if (mods[0].moderators == '[]') {
+        moderators = [];
+      } else {
+        moderators = mods[0].moderators.replace(/[\[\]"]/g, '').split(',');
+      }
+    }
     let isModerator = false;
 
     for (const mod of moderators) {
@@ -216,7 +226,15 @@ export async function checkMembership(gid) {
       return { isMember: false, isOwner, isModerator };
     }
 
-    let usersInGroup = usersRow[0].users_in_group.replace(/[\[\]"]/g, '').split(',');
+    let usersInGroup = [];
+    if (usersRow[0].users_in_group) {
+      if (usersRow[0].users_in_group == '[]') {
+        usersInGroup = [];
+      } else {
+        usersInGroup = usersRow[0].users_in_group.replace(/[\[\]"]/g, '').split(',');
+      }
+    }
+
     for (const usern of usersInGroup) {
       if (usern.trim() == username) {
         return { isMember: true, isOwner, isModerator };
@@ -276,13 +294,17 @@ export async function getIsRequested(gid) {
     const parsed = await decrypt(session);
     const username = parsed.user.username;
 
-    const isReq = await connection.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
-
-    if (!isReq || !isReq[0] || !isReq[0][0] || !isReq[0][0].requests) {
-      return false;
+    let requests = [];
+    const [isReq] = await connection.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
+    if (isReq[0].requests) {
+      if (isReq[0].requests == '[]') {
+        requests = [];
+      } else {
+        requests = isReq[0].requests.replace(/[\[\]"]/g, '').split(',');
+      }
     }
 
-    for (const req of isReq[0][0].requests) {
+    for (const req of requests) {
       if (req == username) {
         return true;
       }
@@ -304,21 +326,35 @@ export async function joinGroup(groupID) {
 
     const gid = parseInt(groupID, 10);
 
+    let userGroups = [];
     const [userRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
-    let userGroups = userRow[0]?.groups;
-
-    if (!userGroups) {
-      userGroups = [];
+    if (userRow[0].groups) {
+      if (userRow[0].groups == '[]') {
+        userGroups = [];
+      } else {
+        userGroups = userRow[0]?.groups.replace(/[\[\]"]/g, '').split(',');
+      }
     }
 
-    userGroups.push(gid);
-    await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), username]);
+    let userG = [];
+    if (userGroups && userGroups.length > 0) {
+      for (const groupID of userGroups) {
+        const id = parseInt(groupID, 10);
+        userG.push(id);
+      }
+    }
+    userG.push(gid);
 
+    await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userG), username]);
+
+    let users = [];
     const [groupRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
-    let users = groupRow[0]?.users_in_group;
-
-    if (!users) {
-      users = [];
+    if (groupRow[0].users_in_group) {
+      if (groupRow[0].users_in_group == '[]') {
+        users = [];
+      } else {
+        users = groupRow[0]?.users_in_group.replace(/[\[\]"]/g, '').split(',');
+      }
     }
 
     users.push(username);
@@ -339,18 +375,47 @@ export async function leaveGroup(groupID) {
 
     const gid = parseInt(groupID, 10);
 
+    let userGroups = [];
     const [userRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
-    let userGroups = userRow[0]?.groups || [];
+    if (userRow[0].groups) {
+      if (userRow[0].groups == '[]') {
+        userGroups = [];
+      } else {
+        userGroups = userRow[0]?.groups.replace(/[\[\]"]/g, '').split(',') || [];
+      }
+    }
 
-    userGroups = userGroups.filter(group => group !== gid);
-    await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), username]);
+    let userG = [];
+    if (userGroups && userGroups.length > 0) {
+      for (const groupID of userGroups) {
+        const id = parseInt(groupID, 10);
+        userG.push(id);
+      }
+    }
+    userG = userG.filter(group => group !== gid);
 
+    await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userG), username]);
+
+    let users = [];
     const [groupRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
-    let users = groupRow[0]?.users_in_group || [];
+    if (groupRow[0].users_in_group) {
+      if (groupRow[0].users_in_group == '[]') {
+        users = [];
+      } else {
+        users = groupRow[0]?.users_in_group.replace(/[\[\]"]/g, '').split(',') || [];
+      }
+    }
     users = users.filter(user => user !== username);
 
+    let moderators = [];
     const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
-    let moderators = mods[0].moderators;
+    if (mods[0].moderators) {
+      if (mods[0].moderators == '[]') {
+        moderators = [];
+      } else {
+        moderators = mods[0].moderators.replace(/[\[\]"]/g, '').split(',');
+      }
+    }
     moderators = moderators.filter(mod => mod !== username);
 
     await connection.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
@@ -369,11 +434,14 @@ export async function requestToJoin(gid) {
     const parsed = await decrypt(session);
     const username = parsed.user.username;
 
+    let requests = [];
     const [requestRow] = await connection.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
-    let requests = requestRow[0]?.requests;
-
-    if (!requests) {
-      requests = []
+    if (requestRow[0].requests) {
+      if (requestRow[0].requests == '[]') {
+        requests = [];
+      } else {
+        requests = requestRow[0]?.requests.replace(/[\[\]"]/g, '').split(',');
+      }
     }
 
     requests.push(username);
@@ -392,11 +460,14 @@ export async function cancelRequest(gid) {
     const parsed = await decrypt(session);
     const username = parsed.user.username;
 
+    let requests = [];
     const [requestRow] = await connection.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
-    let requests = requestRow[0]?.requests;
-
-    if (!requests) {
-      requests = [];
+    if (requestRow[0].requests) {
+      if (requestRow[0].requests == '[]') {
+        requests = [];
+      } else {
+        requests = requestRow[0]?.requests.replace(/[\[\]"]/g, '').split(',');
+      }
     }
 
     requests = requests.filter(user => user !== username);
@@ -446,8 +517,15 @@ export async function getPosts(gid) {
     const [ownerRow] = await connection.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
     const owner = ownerRow[0].owner_username;
 
+    let moderators = [];
     const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
-    const moderators = mods[0].moderators;
+    if (mods[0].moderators) {
+      if (mods[0].moderators == '[]') {
+        moderators = [];
+      } else {
+        moderators = mods[0].moderators.replace(/[\[\]"]/g, '').split(',');
+      }
+    }
 
     for (let post of postsRow) {
       let isOwner = false;
@@ -527,8 +605,15 @@ export async function getMedia(gid) {
     const [ownerRow] = await connection.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
     const owner = ownerRow[0].owner_username;
 
+    let moderators = [];
     const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
-    const moderators = mods[0].moderators;
+    if (mods[0].moderators) {
+      if (mods[0].moderators == '[]') {
+        moderators = [];
+      } else {
+        moderators = mods[0].moderators.replace(/[\[\]"]/g, '').split(',');
+      }
+    }
 
     for (let media of mediaRow) {
       let isOwner = false;
@@ -585,35 +670,49 @@ export async function getUsers(gid) {
     const username = parsed.user.username;
 
     const userArray = [];
+    let users = [];
     const [userRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
-    const users = userRow[0].users_in_group;
+    if (userRow[0].users_in_group) {
+      if (userRow[0].users_in_group == '[]') {
+        users = [];
+      } else {
+        users = userRow[0].users_in_group.replace(/[\[\]"]/g, '').split(',');
+      }
+    }
 
     const [ownerRow] = await connection.query('SELECT owner_username FROM `groups` WHERE id = ?', [gid]);
     const owner = ownerRow[0].owner_username;
 
+    let moderators = [];
     const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
-    const moderators = mods[0].moderators;
+    if (mods[0].moderators) {
+      if (mods[0].moderators == '[]') {
+        moderators = [];
+      } else {
+        moderators = mods[0].moderators.replace(/[\[\]"]/g, '').split(',');
+      }
+    }
 
     for (const user of users) {
       let isOwner = false;
       let isModerator = false;
       let isMe = false;
-      if (user == owner) {
+      if (user.trim() == owner) {
         isOwner = true;
       }
 
       for (const mod of moderators) {
-        if (user == mod) {
+        if (user.trim() == mod.trim()) {
           isModerator = true;
         }
       }
 
-      if (user == username) {
+      if (user.trim() == username) {
         isMe = true;
       }
 
       const userObject = {
-        username: user,
+        username: user.trim(),
         isMe: isMe,
         isOwner: isOwner,
         isModerator: isModerator
@@ -630,8 +729,16 @@ export async function getUsers(gid) {
 export async function getRequests(gid) {
   const connection = await pool.getConnection();
   try {
+    let req = [];
     const [reqRow] = await connection.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
-    const req = reqRow[0].requests;
+    if (reqRow[0].requests) {
+      if (reqRow[0].requests == '[]') {
+        req = [];
+      } else {
+        req = reqRow[0].requests.replace(/[\[\]"]/g, '').split(',');
+      }
+    }
+
     return req;
   } finally {
     connection.destroy();
@@ -643,25 +750,54 @@ export async function acceptRequest(groupID, accept, user) {
   try {
     const gid = parseInt(groupID, 10);
 
+    let requests = [];
     const [reqRow] = await connection.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
-    let requests = reqRow[0].requests;
+    if (reqRow[0].requests) {
+      if (reqRow[0].requests == '[]') {
+        requests = [];
+      } else {
+        requests = reqRow[0].requests.replace(/[\[\]"]/g, '').split(',');
+      }
+    }
 
+    let users = [];
     const [userRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
-    let users = userRow[0].users_in_group;
+    if (userRow[0].users_in_group) {
+      if (userRow[0].users_in_group == '[]') {
+        users = [];
+      } else {
+        users = userRow[0].users_in_group.replace(/[\[\]"]/g, '').split(',');
+      }
+    }
 
+    let userGroups = [];
     const [groupRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [user]);
-    let userGroups = groupRow[0].groups;
+    if (groupRow[0].groups) {
+      if (groupRow[0].groups == '[]') {
+        userGroups = [];
+      } else {
+        userGroups = groupRow[0].groups.replace(/[\[\]"]/g, '').split(',');
+      }
+    }
+
+    let userG = [];
+    if (userGroups && userGroups.length > 0) {
+      for (const groupID of userGroups) {
+        const id = parseInt(groupID, 10);
+        userG.push(id);
+      }
+    }
 
     requests = requests.filter(request => request !== user);
   
     if (accept) {
       users.push(user);
-      userGroups.push(gid);
+      userG.push(gid);
     }
 
     await connection.query('UPDATE `groups` SET requests = ? WHERE id = ?', [JSON.stringify(requests), gid]);
     await connection.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
-    await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), user]);
+    await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userG), user]);
   } finally {
     connection.destroy();
   }
@@ -670,11 +806,14 @@ export async function acceptRequest(groupID, accept, user) {
 export async function handleMod(gid, user) {
   const connection = await pool.getConnection();
   try {
+    let moderators = [];
     const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
-    let moderators = mods[0].moderators;
-
-    if (!moderators) {
-      moderators = [];
+    if (mods[0].moderators) {
+      if (mods[0].moderators == '[]') {
+        moderators = [];
+      } else {
+        moderators = mods[0].moderators.replace(/[\[\]"]/g, '').split(',') || [];
+      }
     }
 
     moderators.push(user);
@@ -688,11 +827,14 @@ export async function handleMod(gid, user) {
 export async function removeMod(gid, user) {
   const connection = await pool.getConnection();
   try {
+    let moderators = [];
     const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
-    let moderators = mods[0].moderators;
-
-    if (!moderators) {
-      moderators = [];
+    if (mods[0].moderators) {
+      if (mods[0].moderators == '[]') {
+        moderators = [];
+      } else {
+        moderators = mods[0].moderators.replace(/[\[\]"]/g, '').split(',') || [];
+      }
     }
 
     moderators = moderators.filter(mod => mod !== user);
@@ -708,22 +850,51 @@ export async function kickUser(groupID, user) {
   try {
     const gid = parseInt(groupID, 10);
 
+    let users = [];
     const [userRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
-    let users = userRow[0].users_in_group;
+    if (userRow[0].users_in_group) {
+      if (userRow[0].users_in_group == '[]') {
+        users = [];
+      } else {
+        users = userRow[0].users_in_group.replace(/[\[\]"]/g, '').split(',');
+      }
+    }
 
+    let moderators = [];
     const [mods] = await connection.query('SELECT moderators FROM `groups` WHERE id = ?', [gid]);
-    let moderators = mods[0].moderators || [];
+    if (mods[0].moderators) {
+      if (mods[0].moderators == '[]') {
+        moderators = [];
+      } else {
+        moderators = mods[0].moderators.replace(/[\[\]"]/g, '').split(',') || [];
+      }
+    }
 
+    let userGroups = [];
     const [groupRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [user]);
-    let userGroups = groupRow[0].groups;
+    if (groupRow[0].groups) {
+      if (groupRow[0].groups == '[]') {
+        userGroups = [];
+      } else {
+        userGroups = groupRow[0].groups.replace(/[\[\]"]/g, '').split(',');
+      }
+    }
+
+    let userG = [];
+    if (userGroups && userGroups.length > 0) {
+      for (const groupID of userGroups) {
+        const id = parseInt(groupID, 10);
+        userG.push(id);
+      }
+    }
 
     users = users.filter(username => username !== user);
     moderators = moderators.filter(username => username !== user);
-    userGroups = userGroups.filter(group => group !== gid);
+    userG = userG.filter(group => group !== gid);
 
     await connection.query('UPDATE `groups` SET users_in_group = ? WHERE id = ?', [JSON.stringify(users), gid]);
     await connection.query('UPDATE `groups` SET moderators = ? WHERE id = ?', [JSON.stringify(moderators), gid]);
-    await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), user]);
+    await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userG), user]);
   } finally {
     connection.destroy();
   }
@@ -757,16 +928,21 @@ export async function createGroup(formData) {
 
     const [row] = await connection.query('SELECT id FROM `groups` WHERE uuid = ?', [uniqueid]);
     const storedID = row[0]?.id;
+    const storedIDInt = parseInt(storedID, 10);
 
     const [userRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
     let userGroups = userRow[0]?.groups;
 
-    if (!userGroups) {
-      userGroups = [];
+    let userG = [];
+    if (userGroups && userGroups.length > 0) {
+      for (const groupID of userGroups) {
+        const id = parseInt(groupID, 10);
+        userG.push(id);
+      }
     }
 
-    userGroups.push(storedID);
-    await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userGroups), username]);
+    userG.push(storedIDInt);
+    await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userG), username]);
 
     return storedID;
   } finally {
@@ -777,13 +953,36 @@ export async function createGroup(formData) {
 export async function deleteGroup(gid) {
   const connection = await pool.getConnection();
   try {
+    let usersArray = [];
     const [groupRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
-    const usersArray = groupRow[0].users_in_group;
+    if (groupRow[0].users_in_group) {
+      if (groupRow[0].users_in_group == '[]') {
+        usersArray = [];
+      } else {
+        usersArray = groupRow[0].users_in_group.replace(/[\[\]"]/g, '').split(',');
+      }
+    }
 
     for (const username of usersArray) {
+      let userGroups = [];
       const [userRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
-      let userGroups = userRow[0].groups;
-      let newArray = userGroups.filter(id => id != gid);
+      if (userRow[0].groups) {
+        if (userRow[0].groups == '[]') {
+          userGroups = [];
+        } else {
+          userGroups = userRow[0].groups.replace(/[\[\]"]/g, '').split(',');
+        }
+      }
+
+      let userG = [];
+      if (userGroups && userGroups.length > 0) {
+        for (const groupID of userGroups) {
+          const id = parseInt(groupID, 10);
+          userG.push(id);
+        }
+      }
+      
+      let newArray = userG.filter(id => id != gid);
 
       await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(newArray), username]);
     }
@@ -808,17 +1007,28 @@ export async function getUserGroups() {
 
     let groupsArray = [];
 
-    const [groupRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username])
-    const groups = groupRow[0].groups;
-
-    if (!groups) {
-      return groupsArray;
+    let groups = [];
+    const [groupRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
+    if (groupRow[0].groups) {
+      if (groupRow[0].groups == '[]') {
+        groups = [];
+      } else {
+        groups = groupRow[0].groups.replace(/[\[\]"]/g, '').split(',');
+      }
     }
 
-    for (const group of groups) {
-      const [groupR] = await connection.query('SELECT * FROM `groups` WHERE id = ?', [group]);
+    let userG = [];
+    if (groups && groups.length > 0) {
+      for (const groupID of groups) {
+        const id = parseInt(groupID, 10);
+        userG.push(id);
+      }
+    }
 
-      if (groupR[0]) {
+    if (userG.length > 0) {
+      for (const group of userG) {
+        const [groupR] = await connection.query('SELECT * FROM `groups` WHERE id = ?', [group]);
+
         groupsArray.push(groupR[0]);
       }
     }
@@ -857,17 +1067,28 @@ export async function getProfileGroups(username) {
   try {
     let groupsArray = [];
 
-    const [groupRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username])
-    const groups = groupRow[0].groups;
-
-    if (!groups) {
-      return groupsArray;
+    let groups = [];
+    const [groupRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
+    if (groupRow[0].groups) {
+      if (groupRow[0].groups == '[]') {
+        groups = [];
+      } else {
+        groups = groupRow[0].groups.replace(/[\[\]"]/g, '').split(',');
+      }
     }
 
-    for (const group of groups) {
-      const [groupR] = await connection.query('SELECT * FROM `groups` WHERE id = ?', [group]);
+    let userG = [];
+    if (groups && groups.length > 0) {
+      for (const groupID of groups) {
+        const id = parseInt(groupID, 10);
+        userG.push(id);
+      }
+    }
 
-      if (groupR[0]) {
+    if (userG.length > 0) {
+      for (const group of userG) {
+        const [groupR] = await connection.query('SELECT * FROM `groups` WHERE id = ?', [group]);
+
         groupsArray.push(groupR[0]);
       }
     }
