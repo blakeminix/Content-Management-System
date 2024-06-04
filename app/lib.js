@@ -60,6 +60,9 @@ export async function login(formData) {
     const [row] = await connection.query('SELECT password FROM users WHERE username = ?', [name]);
     const storedPassword = row[0]?.password;
 
+    const [userRow] = await connection.query('SELECT username FROM users WHERE username = ?', [name]);
+    const storedUsername = userRow[0].username;
+
     const [deletedRow] = await connection.query('SELECT isDeleted FROM users WHERE username = ?', [name]);
     if (!deletedRow[0]) {
       return;
@@ -73,7 +76,7 @@ export async function login(formData) {
     }
 
     if (passwordMatch) {
-      const user = { username: name, sid: v4() };
+      const user = { username: storedUsername, sid: v4() };
 
       // Create the session
       const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
