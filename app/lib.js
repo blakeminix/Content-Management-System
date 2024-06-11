@@ -51,21 +51,21 @@ export async function decrypt(input) {
   return payload;
 }
 
-export async function login(formData) {
+export async function login(name, password) {
   const connection = await pool.getConnection();
   try {
-    const name = formData.get("username");
-    const password = formData.get("password");
-
     const [row] = await connection.query('SELECT password FROM users WHERE username = ?', [name]);
     const storedPassword = row[0]?.password;
 
     const [userRow] = await connection.query('SELECT username FROM users WHERE username = ?', [name]);
+    if (!userRow || !userRow[0] || !userRow[0].username) {
+      return 0;
+    }
     const storedUsername = userRow[0].username;
 
     const [deletedRow] = await connection.query('SELECT isDeleted FROM users WHERE username = ?', [name]);
     if (!deletedRow[0]) {
-      return;
+      return 0;
     }
     const isDeleted = deletedRow[0].isDeleted;
 
@@ -84,9 +84,9 @@ export async function login(formData) {
 
       // Save the session in a cookie
       cookies().set("session", session, { expires, httpOnly: true });
-      redirect('/dashboard');
+      return 1;
     } else {
-      redirect('/.');
+      return 0;
     }
   } finally {
     connection.destroy();
