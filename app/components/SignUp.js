@@ -60,13 +60,13 @@ export function SignUp() {
           }}
         >
           <label htmlFor="username" className="block text-sm font-medium text-white mb-3">Username</label>
-          <input className="p-4 w-full border rounded-lg mb-6" type="username" name="username" id="username" placeholder="Username" maxLength={30} autoComplete='off'/>
+          <input className="p-4 w-full border rounded-lg mb-6" type="username" name="username" id="username" placeholder="Username" maxLength={30} autoComplete='off' autoCapitalize="off"/>
   
           <label htmlFor="password" className="block text-sm font-medium text-white mb-3">Password</label>
-          <input className="p-4 w-full border rounded-lg mb-6" type="password" name="password" id="password" placeholder="Password" maxLength={44} autoComplete='off'/>
+          <input className="p-4 w-full border rounded-lg mb-6" type="password" name="password" id="password" placeholder="Password" maxLength={44} autoComplete='off' autoCapitalize="off"/>
   
           <label htmlFor="repeatPassword" className="block text-sm font-medium text-white mb-3">Repeat Password</label>
-          <input className="p-4 w-full border rounded-lg mb-6" type="password" name="repeatPassword" id="repeatPassword" placeholder="Repeat Password" maxLength={44} autoComplete='off'/>
+          <input className="p-4 w-full border rounded-lg mb-6" type="password" name="repeatPassword" id="repeatPassword" placeholder="Repeat Password" maxLength={44} autoComplete='off' autoCapitalize="off"/>
   
           <button className="h-12 w-full bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors mb-3" type="submit">Sign Up</button>
         </form>
