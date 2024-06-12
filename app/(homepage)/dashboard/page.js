@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getUserGroups, getSession } from '@/app/lib';
 import { redirect } from 'next/navigation';
 import { ProfileDropdown } from '../../components/ProfileDropdown'
+import { Dashboard } from '@/app/components/Dashboard';
 
 export const metadata = {
   title: "Dashboard | CMS",
@@ -41,20 +42,7 @@ export default async function Page() {
           <ProfileDropdown />
         </div>
       </div>
-      <div className="pt-20 px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {groups && groups.length > 0 ? (
-            groups.map(group => (
-              <Link className="block p-6 bg-gray-100 rounded-lg shadow-md hover:bg-gray-200 transition-colors duration-300" key={group.id} href={`/groups/${group.id}`}>
-                <div className='text-lg font-semibold text-gray-800 mb-2'>{group.group_name}</div>
-                <div className='text-sm text-gray-600'>#{group.id}</div>
-              </Link>
-            ))
-          ) : (
-            <p className="col-span-full text-center text-gray-500">No groups available</p>
-          )}
-        </div>
-      </div>
+      <Dashboard />
     </div>
   );
 }

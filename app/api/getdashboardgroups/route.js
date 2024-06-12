@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { getProfileGroups } from "@/app/lib";
+import { getUserGroups } from "@/app/lib";
 
-export async function POST(req, res) {
+export async function POST() {
   try {
-    const { user } = await req.json();
-    const groups = await getProfileGroups(user);
+    const groups = await getUserGroups();
     return NextResponse.json({ groups });
   } catch (error) {
     console.error('Get groups failed:', error);
