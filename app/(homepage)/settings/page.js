@@ -31,24 +31,32 @@ export default async function Page() {
   }
     
   return (
-    <div>
-      <div className="top-bar">
-        <Link href="/dashboard">Dashboard</Link>
-        <Link href="/creategroup">Create Group</Link>
-        <ProfileDropdown />
+    <div className='min-h-screen'>
+      <div className="flex items-center h-16 fixed top-0 w-full z-50 p-3 bg-gray-800 text-white shadow-md">
+        <div className="flex items-center flex-grow">
+          <Link className="px-4 py-2 text-lg font-semibold hover:bg-gray-700 rounded transition-colors duration-300" href="/dashboard">Dashboard</Link>
+          <Link className="px-4 py-2 text-lg font-semibold hover:bg-gray-700 rounded transition-colors duration-300" href="/creategroup">Create Group</Link>
+          <ProfileDropdown />
+        </div>
       </div>
 
-      <form
-        action={async () => {
-          "use server";
-          await deleteAccount();
-          redirect("/.");
-        }}
+      <main className="flex flex-col items-center pt-24">
+        <form
+          className="flex flex-col items-center"
+          action={async () => {
+            "use server";
+            await deleteAccount();
+            redirect("/.");
+          }}
         >
-          <div className='group-row'>
-            <button className="login-button" type="submit">Delete Account</button>
-          </div>
+          <button
+            className="px-6 py-2 bg-red-800 text-white font-semibold rounded hover:bg-red-700 transition-colors duration-300"
+            type="submit"
+          >
+            Delete Account
+          </button>
         </form>
+      </main>
 
     </div>
   );
