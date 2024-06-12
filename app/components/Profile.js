@@ -129,47 +129,42 @@ export function Profile() {
       };
 
     if (loading) {
-        return <div></div>;
+      return <div className="flex justify-center items-center h-screen"><div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"></div></div>;
     }
     
     return (
-        <div>
-        <div className="post-container">
+      <div className="min-h-screen p-6 pt-24">
+        <div className="max-w-4xl mx-auto bg-gray-800 p-6 rounded-lg shadow-md">
         {isMe ? (
           <div>
           <form
+          className="space-y-4"
             action={async (formData) => {
               await addProfileDescription(formData);
             }}
           >
-            <div className="post-box-container">
-              <textarea className="description-box" type="post" name="description" placeholder="Description" autoComplete="off" rows={100} maxLength={100000} value={description} onChange={(e) => setDescription(e.target.value)}/>
-              <br />
-              <button className="post-button" type="submit">Upload Description</button>
-            </div>
+            <textarea className="w-full p-4 border border-gray-300 rounded-md focus:ring focus:ring-blue-500 focus:outline-none" type="post" name="description" placeholder="Description" autoComplete="off" rows={5} maxLength={100000} value={description} onChange={(e) => setDescription(e.target.value)}/>
+            <button className="w-full bg-blue-700 text-white font-semibold py-2 rounded-md hover:bg-blue-600 transition-colors duration-300" type="submit">Upload Description</button>
           </form>
           </div>
         ) :  (
-          <div className='post-list'>
-            <div className="post" key={description}>
-              <div className="post-content" dangerouslySetInnerHTML={createMarkup(description)} />
-            </div>
+          <div className="max-w-none" dangerouslySetInnerHTML={createMarkup(description)} />
+        )}
+      </div>
+      <div className="pt-20 px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {groups && groups.length > 0 ? (
+              groups.map(group => (
+                <Link className="block p-6 bg-gray-800 rounded-lg shadow-md hover:bg-gray-700 transition-colors duration-300" key={group.id} href={`/groups/${group.id}`}>
+                  <div className='text-lg font-semibold text-white mb-2'>{group.group_name}</div>
+                  <div className='text-sm text-gray-400'>#{group.id}</div>
+                </Link>
+              ))
+            ) : (
+              <p className="col-span-full text-center text-gray-500">No groups available</p>
+            )}
           </div>
-        )}
-      </div>
-      <div className="group-row">
-        {groups && groups.length > 0 ? (
-          groups.map(group => (
-            <Link className="group-link" key={group.id} href={`/groups/${group.id}`}>
-                <div>{group.group_name}</div>
-                <br />
-                <div>#{group.id}</div>
-            </Link>
-          ))
-        ) : (
-          <p></p>
-        )}
-      </div>
+        </div>
       </div>
     );
 }

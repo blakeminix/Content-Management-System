@@ -51,10 +51,10 @@ export function Login() {
             }}
           >
             <label htmlFor="username" className="block text-sm font-medium text-white mb-3">Username</label>
-            <input className="p-4 w-full border rounded-lg mb-6" type="text" name="username" id="username" placeholder="Username"/>
+            <input className="p-4 w-full border rounded-lg mb-6" type="text" name="username" id="username" placeholder="Username" autoComplete="username" autoCapitalize="off"/>
   
             <label htmlFor="password" className="block text-sm font-medium text-white mb-3">Password</label>
-            <input className="p-4 w-full border rounded-lg mb-10" type="password" name="password" id="password" placeholder="Password"/>
+            <input className="p-4 w-full border rounded-lg mb-10" type="password" name="password" id="password" placeholder="Password" autoComplete="current-password" autoCapitalize="off"/>
   
             <button className="h-12 w-full bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors mb-3" type="submit">Login</button>
           </form>
