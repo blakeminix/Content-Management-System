@@ -42,8 +42,8 @@ export function Login() {
     };
 
     return (
-        <section className='min-h-screen flex justify-center bg-gray-900'>
-        <div className='p-8 rounded-lg max-w-sm md:max-w-md lg:max-w-md w-full mt-1 sm:mt-4 lg:mt-8'>
+        <section className='min-h-screen h-full flex justify-center bg-gray-900'>
+        <div className='p-8 rounded-lg max-w-sm md:max-w-md lg:max-w-md w-full mt-4 sm:mt-8 lg:mt-12'>
           <h1 className='text-xl md:text-2xl lg:text-2xl font-bold mb-12 lg:mb-16 text-center'>Content Management System</h1>
           <form
             action={async (formData) => {
@@ -71,6 +71,6 @@ export function Login() {
             <button className="h-12 w-full bg-gray-600 text-white rounded-lg mt-2 hover:bg-gray-700 transition-colors" type="submit">Don't have an account? Sign Up</button>
           </form>
         </div>
-      </section>
+        </section>
     );
 }
