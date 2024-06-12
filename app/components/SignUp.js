@@ -68,7 +68,7 @@ export function SignUp() {
           <label htmlFor="repeatPassword" className="block text-sm font-medium text-white mb-3">Repeat Password</label>
           <input className="p-4 w-full border rounded-lg mb-6" type="password" name="repeatPassword" id="repeatPassword" placeholder="Repeat Password" maxLength={44} autoComplete='off'/>
   
-          <button className="h-12 w-full bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors mb-3" type="submit">Sign Up</button>
+          <button className="h-12 w-full bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors mb-3" type="submit">Sign Up</button>
         </form>
 
         {errorMessage && <p className="text-red-500 text-center mb-4">{errorMessage}</p>}
@@ -80,7 +80,7 @@ export function SignUp() {
            await loginPage();
           }}
         >
-          <button className="h-12 w-full bg-gray-600 text-white rounded-lg mt-2 hover:bg-gray-700 transition-colors" type="submit">Back to Login</button>
+          <button className="h-12 w-full bg-gray-700 text-white rounded-lg mt-2 hover:bg-gray-600 transition-colors" type="submit">Back to Login</button>
         </form>
         </div>
         </section>

@@ -45,7 +45,7 @@ export function Dashboard() {
     return (
         <div className='min-h-screen'>
         <div className="pt-20 px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {groups && groups.length > 0 ? (
               groups.map(group => (
                 <Link className="block p-6 bg-gray-800 rounded-lg shadow-md hover:bg-gray-700 transition-colors duration-300" key={group.id} href={`/groups/${group.id}`}>

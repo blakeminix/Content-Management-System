@@ -51,12 +51,12 @@ export function Login() {
             }}
           >
             <label htmlFor="username" className="block text-sm font-medium text-white mb-3">Username</label>
-            <input className="p-4 w-full border rounded-lg mb-6" type="text" name="username" id="username" placeholder="Username" autoComplete='off'/>
+            <input className="p-4 w-full border rounded-lg mb-6" type="text" name="username" id="username" placeholder="Username"/>
   
             <label htmlFor="password" className="block text-sm font-medium text-white mb-3">Password</label>
-            <input className="p-4 w-full border rounded-lg mb-10" type="password" name="password" id="password" placeholder="Password" autoComplete='off'/>
+            <input className="p-4 w-full border rounded-lg mb-10" type="password" name="password" id="password" placeholder="Password"/>
   
-            <button className="h-12 w-full bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors mb-3" type="submit">Login</button>
+            <button className="h-12 w-full bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors mb-3" type="submit">Login</button>
           </form>
 
           {errorMessage && <p className="text-red-500 text-center mb-4">{errorMessage}</p>}
@@ -68,7 +68,7 @@ export function Login() {
               await signUpPage();
             }}
           >
-            <button className="h-12 w-full bg-gray-600 text-white rounded-lg mt-2 hover:bg-gray-700 transition-colors" type="submit">Don't have an account? Sign Up</button>
+            <button className="h-12 w-full bg-gray-700 text-white rounded-lg mt-2 hover:bg-gray-600 transition-colors" type="submit">Don't have an account? Sign Up</button>
           </form>
         </div>
         </section>
