@@ -1,11 +1,9 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import '../globals.css'
 import { useRouter } from "next/navigation";
 import { usePathname } from 'next/navigation'
 
-// Might be good to add a "dark mode" slider here later, as well as a dark mode setting in settings.
 export function ProfileDropdown() {
   const router = useRouter();
   const [showDropdown, setShowDropdown] = useState(false);
