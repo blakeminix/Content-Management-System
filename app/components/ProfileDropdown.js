@@ -2,33 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { usePathname } from 'next/navigation'
 
 export function ProfileDropdown() {
   const router = useRouter();
-  const [showDropdown, setShowDropdown] = useState(false);
   const [username, setUsername] = useState('');
-  const pathname = usePathname()
-
-  function toggleDropdown() {
-    const dropdown = document.getElementById("dropdown-content");
-    dropdown.classList.toggle("show");
-  }
-
-  useEffect(() => {
-    window.onclick = function(event) {
-      if (!event.target.matches('.prof')) {
-        const dropdowns = document.getElementsByClassName("dropdown-content");
-        for (let i = 0; i < dropdowns.length; i++) {
-          const dropdown = dropdowns[i];
-          if (dropdown.classList.contains('show')) {
-            dropdown.classList.remove('show');
-          }
-        }
-      }
-    }
-    router.refresh();
-  }, []);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     const getUsername = async () => {
@@ -49,9 +27,22 @@ export function ProfileDropdown() {
       } catch (error) {
         console.error('Get username failed:', error);
       }
-    }
-    
+    };
+
     getUsername();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.dropdown-container')) {
+        setShowDropdown(false);
+      }
+    };
+
+    window.addEventListener('click', handleClickOutside);
+    return () => {
+      window.removeEventListener('click', handleClickOutside);
+    };
   }, []);
 
   function handleProfile() {
@@ -81,13 +72,26 @@ export function ProfileDropdown() {
   };
 
   return (
-    <div>
-      <button className="prof" onClick={toggleDropdown}></button>
-      <div className="dropdown-content" id="dropdown-content">
-        <button className="dropdown-button" onClick={handleProfile}>My Profile</button>
-        <button className="dropdown-button" onClick={handleSettings}>Settings</button>
-        <button className="dropdown-button" onClick={handleLogout}>Logout</button>
-      </div>
+    <div className="relative dropdown-container">
+      <button
+        className="fixed right-10 top-3 p-2 rounded-full bg-gray-700 hover:bg-gray-600 focus:bg-gray-600 text-white w-10 h-10 flex items-center justify-center"
+        onClick={() => setShowDropdown(!showDropdown)}
+        aria-expanded={showDropdown}
+        aria-haspopup="true"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </button>
+      {showDropdown && (
+        <div className="fixed z-50 right-10 mt-5 w-48 rounded-md shadow-lg bg-gray-900 ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+            <button onClick={handleProfile} className="w-full block px-4 py-2 text-sm text-white hover:bg-gray-800" role="menuitem">My Profile</button>
+            <button onClick={handleSettings} className="w-full block px-4 py-2 text-sm text-white hover:bg-gray-800" role="menuitem">Settings</button>
+            <button onClick={handleLogout} className="w-full block px-4 py-2 text-sm text-white hover:bg-gray-800 mb-1" role="menuitem">Logout</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

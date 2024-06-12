@@ -15,54 +15,9 @@
   padding: 10px 0px;
 }
 
-.prof {
-  width: 40px;
-  height: 40px;
-  background-color: white;
-  border-radius: 50%;
-  position: fixed;
-  right: 45px;
-  top: 10px;
-}
-
-.prof:hover {
-  cursor: pointer;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  top: calc(100% + -8px);
-  right: 45px;
-  background-color: rgb(23, 23, 23);
-  border-radius: 8px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  padding: 8px;
-  z-index: 1000;
-  flex-direction: column;
-}
-
-.dropdown-content.show {
-  display: flex;
-}
-
-.dropdown-content a {
-  display: block;
-  padding: 12px 5px;
-  color: white;
-  text-decoration: none;
-}
-
-.dropdown-content a:hover {
-  background-color: #333;
-}
 
 .top-bar a {
   padding-left: 40px;
-}
-
-.dropdown-link {
-  color: black;
 }
 
 .dash-link {
