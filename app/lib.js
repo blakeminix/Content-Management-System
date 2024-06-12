@@ -936,8 +936,15 @@ export async function createGroup(formData) {
     const storedID = row[0]?.id;
     const storedIDInt = parseInt(storedID, 10);
 
+    let userGroups = [];
     const [userRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
-    let userGroups = userRow[0]?.groups;
+    if (userRow[0].groups) {
+      if (userRow[0].groups == '[]') {
+        userGroups = [];
+      } else {
+        userGroups = userRow[0].groups.replace(/[\[\]"]/g, '').split(',');
+      }
+    }
 
     let userG = [];
     if (userGroups && userGroups.length > 0) {

@@ -44,7 +44,7 @@ export default async function Page() {
           redirect(`/groups/${id}`);
         }}
       >
-        <input className="text-box" type="username" name="group_name" placeholder="Group Name" maxLength={30}/>
+        <input className="text-box" type="username" name="group_name" placeholder="Group Name" maxLength={24}/>
         <br />
         <br />
         <div>
