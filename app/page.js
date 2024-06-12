@@ -26,6 +26,7 @@ export default async function Page() {
   if (session != null) {
     redirect('/dashboard');
   }
+  
   return (
     <Login />
   );

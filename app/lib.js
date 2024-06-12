@@ -104,19 +104,22 @@ export async function getSession() {
   return await decrypt(session);
 }
 
-export async function signup(formData) {
+export async function signup(name, password, repeatPassword) {
   const connection = await pool.getConnection();
   try {
-    const name = formData.get("username");
-    const password = formData.get("password");
-    const repeatPassword = formData.get('repeatPassword');
-
     const usernameRegex = /^[A-Za-z0-9]+$/;
     const passwordRegex = /^\S*$/;
 
-    if (!usernameRegex.test(name) || !passwordRegex.test(password)) {
-      redirect('/signup');
-      return;
+    if (!usernameRegex.test(name)) {
+      return 3;
+    }
+
+    if (password != repeatPassword) {
+      return 5;
+    }
+
+    if (!passwordRegex.test(password)) {
+      return 4;
     }
 
     const [row] = await connection.query('SELECT username FROM users WHERE username = ?', [name]);
@@ -136,14 +139,14 @@ export async function signup(formData) {
 
         // Save the session in a cookie
         cookies().set("session", session, { expires, httpOnly: true });
-        redirect('/dashboard');
+        return 1;
       } else {
         console.log('Invalid Password or Username')
-        redirect('/signup');
+        return 0;
       }
     } else {
       console.log('Username Taken');
-      redirect('/signup');
+      return 2;
     }
   } finally {
     connection.destroy();
