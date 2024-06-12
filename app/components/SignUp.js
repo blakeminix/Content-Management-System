@@ -51,9 +51,9 @@ export function SignUp() {
     };
 
     return (
-        <section className='min-h-screen h-full flex justify-center bg-gray-900'>
+        <section className='min-h-screen h-full flex justify-center'>
         <div className='p-8 rounded-lg max-w-sm md:max-w-md lg:max-w-md w-full mt-2 sm:mt-3 lg:mt-4'>
-        <h1 className='text-xl md:text-2xl lg:text-2xl font-bold mb-8 lg:mb-10 text-center'>Content Management System</h1>
+        <h1 className='text-xl md:text-2xl lg:text-2xl font-bold mb-10 lg:mb-12 text-center'>Content Management System</h1>
         <form
           action={async (formData) => {
             await handleSignUp(formData);
