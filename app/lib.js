@@ -270,6 +270,8 @@ export async function checkProfile(user) {
 
     if (userRow.length === 0) {
       return { result: false, isMe: isMe };
+    } else if (userRow[0].isDeleted == 1) {
+      return { result: false, isMe: isMe };
     }
     return { result: true, isMe: isMe };
   } finally {
