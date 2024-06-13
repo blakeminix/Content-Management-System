@@ -25,7 +25,7 @@ export function JoinGroup() {
           });
       
           if (!response.ok) {
-            throw new Error('Get posts failed');
+            throw new Error('Get privacy failed');
           }
   
           const data = await response.json();
@@ -54,7 +54,7 @@ export function JoinGroup() {
           });
       
           if (!response.ok) {
-            throw new Error('Get posts failed');
+            throw new Error('Get requested failed');
           }
   
           const data = await response.json();
@@ -85,7 +85,7 @@ export function JoinGroup() {
           });
       
           if (!response.ok) {
-            throw new Error('Get posts failed');
+            throw new Error('Join failed');
           }
 
           const data = await response.json();
@@ -108,7 +108,7 @@ export function JoinGroup() {
         });
     
         if (!response.ok) {
-          throw new Error('Get posts failed');
+          throw new Error('Request failed');
         }
 
         const data = await response.json();
@@ -131,7 +131,7 @@ export function JoinGroup() {
         });
     
         if (!response.ok) {
-          throw new Error('Get posts failed');
+          throw new Error('Cancel request failed');
         }
 
         const data = await response.json();
@@ -155,17 +155,17 @@ export function JoinGroup() {
                 <div>
                   {requested ? (
                     <div>
-                      <button onClick={handleCancelRequest} className="px-6 py-2 mb-6 bg-red-800 text-white font-semibold rounded hover:bg-red-700 transition-colors duration-300">Cancel Request</button>
+                      <button onClick={handleCancelRequest} className="w-full px-6 py-2 mb-6 bg-red-800 text-white font-semibold rounded hover:bg-red-700 transition-colors duration-300">Cancel Request</button>
                     </div>
                   ) : (
-                    <button onClick={handleRequest} className="px-6 py-2 mb-6 bg-blue-700 text-white font-semibold rounded hover:bg-blue-600 transition-colors duration-300">Request to Join</button>
+                    <button onClick={handleRequest} className="w-full px-6 py-2 mb-6 bg-blue-700 text-white font-semibold rounded hover:bg-blue-600 transition-colors duration-300">Request to Join</button>
                   )}
                 </div>
               ) : (
-              <button onClick={handleJoin} className="px-6 py-2 mb-6 bg-blue-700 text-white font-semibold rounded hover:bg-blue-600 transition-colors duration-300">Join Group</button>
+              <button onClick={handleJoin} className="w-full px-6 py-2 mb-6 bg-blue-700 text-white font-semibold rounded hover:bg-blue-600 transition-colors duration-300">Join Group</button>
               )}
             </div>
-            <Link href='/dashboard' className='px-6 py-2 mt-8 bg-blue-700 text-white font-semibold rounded hover:bg-blue-600 transition-colors duration-300'>Back to Dashboard</Link>
+            <Link href='/dashboard' className='w-full px-6 py-2 mt-8 bg-blue-700 text-white font-semibold rounded hover:bg-blue-600 transition-colors duration-300'>Back to Dashboard</Link>
           </div>
         </main>
       </div>
