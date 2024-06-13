@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useRef } from "react";
-import '../globals.css'
 import { useRouter } from "next/navigation";
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -16,6 +15,8 @@ export function Users() {
   const [isModerator, setIsModerator] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const [privacy, setPrivacy] = useState(false);
+  const parts = pathname.split('/');
+  const gid = parts[2];
 
   useEffect(() => {
     const getGroupAndCheckMembership = async () => {
@@ -251,28 +252,47 @@ export function Users() {
   };
 
   if (loading) {
-    return <div></div>;
+    return (
+      <div>
+        <aside className="mx-auto w-full lg:w-[calc(20%-1rem)] bg-gray-800 text-white p-4 pt-20 space-y-1 lg:space-y-4 relative lg:fixed left-0 h-80 lg:h-full">
+          <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}`}>Home</Link>
+          <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}/posts`}>Posts</Link>
+          <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}/media`}>Media</Link>
+          <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}/users`}>Users</Link>
+          <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}/settings`}>Settings</Link>
+        </aside>
+        <div className="flex justify-center items-center h-screen"><div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"></div></div>
+      </div>
+    );
   }
 
   return (
-    <div className="post-container">
+    <div className="flex flex-col lg:flex-row mx-auto w-full max-w-screen-lg lg:px-0 min-h-screen">
+      <aside className="mx-auto w-full lg:w-[calc(20%-1rem)] bg-gray-800 text-white p-4 pt-20 space-y-1 lg:space-y-4 relative lg:fixed left-0 h-80 lg:h-full">
+        <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}`}>Home</Link>
+        <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}/posts`}>Posts</Link>
+        <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}/media`}>Media</Link>
+        <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}/users`}>Users</Link>
+        <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}/settings`}>Settings</Link>
+      </aside>
+
+    <div className="flex-grow p-4 lg:ml-[20%]">
     {isMember && (
-    <><div className='post-list'>
-    <div className="post">
-      <div className="post-content">Users: {users.length}</div>
-    </div>
+    <>
+    <div className="mb-8 mt-6 lg:mt-20">
+      <div className="mb-4 text-lg font-semibold">Users: {users.length}</div>
       {users && users.length > 0 ? (
         users.map(user => (
-          <div className="post" key={user}>
-            <Link href={`/users/${user.username}`} className="post-username">{user.username}</Link>
+          <div className="mb-2 flex items-right justify-between bg-gray-800 p-3 rounded" key={user}>
+            <Link href={`/users/${user.username}`} className="text-blue-400 hover:underline">{user.username}</Link>
             {isOwner && !user.isModerator && !user.isMe && (
-              <button onClick={() => handleMod(user.username)} className="mod-button">Mod</button>
+              <button onClick={() => handleMod(user.username)} className="px-2 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-500">Mod</button>
             )}
             {isOwner && user.isModerator && !user.isMe && (
-              <button onClick={() => removeMod(user.username)} className="remove-mod-button">Remove Mod</button>
+              <button onClick={() => removeMod(user.username)} className="px-2 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-500">Remove Mod</button>
             )}
             {((isOwner || (isModerator && !user.isModerator)) && !user.isMe) && (
-              <button onClick={() => kickUser(user.username)} className="delete-button">Kick</button>
+              <button onClick={() => kickUser(user.username)} className="px-2 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-500">Kick</button>
             )}
           </div>
         ))
@@ -282,16 +302,14 @@ export function Users() {
       </div>
 
     {privacy && isModerator && (
-    <div className='post-list'>
-    <div className="post">
-      <div className="post-content">Requests: {requests.length}</div>
-    </div>
+    <div className="mb-8 mt-16">
+      <div className="mb-4 text-lg font-semibold">Requests: {requests.length}</div>
       {requests && requests.length > 0 ? (
         requests.map(user => (
-          <div className="post" key={user}>
-            <Link href={`/users/${user}`} className="post-username">{user}</Link>
-            <button onClick={() => acceptRequest(true, user)} className="accept-button">Accept</button>
-            <button onClick={() => acceptRequest(false, user)} className="delete-button">Decline</button>
+          <div className="mb-2 flex items-right justify-between bg-gray-800 p-3 rounded" key={user}>
+            <Link href={`/users/${user}`} className="text-blue-400 hover:underline">{user}</Link>
+            <button onClick={() => acceptRequest(true, user)} className="px-2 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-500">Accept</button>
+            <button onClick={() => acceptRequest(false, user)} className="px-2 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-500">Decline</button>
           </div>
         ))
       ) : (
@@ -301,6 +319,7 @@ export function Users() {
       )}
       </>
     )}
+    </div>
     </div>
   );
 }
