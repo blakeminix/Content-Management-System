@@ -9,6 +9,7 @@ export function Profile() {
     const pathname = usePathname();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
+    const [loading2, setLoading2] = useState(true);
     const [username, setUsername] = useState('');
     const [groups, setGroups] = useState([]);
     const [description, setDescription] = useState("");
@@ -74,6 +75,8 @@ export function Profile() {
           setGroups(profileGroups);
         } catch (error) {
           console.error('Get groups failed:', error);
+        } finally {
+          setLoading2(false);
         }
     };
 
@@ -128,7 +131,7 @@ export function Profile() {
         }
       };
 
-    if (loading) {
+    if (loading || loading2) {
       return <div className="flex justify-center items-center h-screen"><div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"></div></div>;
     }
     
@@ -156,7 +159,7 @@ export function Profile() {
             {groups && groups.length > 0 ? (
               groups.map(group => (
                 <Link className="block p-6 bg-gray-800 rounded-lg shadow-md hover:bg-gray-700 transition-colors duration-300" key={group.id} href={`/groups/${group.id}`}>
-                  <div className='text-lg font-semibold text-white mb-2'>{group.group_name}</div>
+                  <div className='text-base lg:text-lg font-semibold text-white mb-2'>{group.group_name}</div>
                   <div className='text-sm text-gray-400'>#{group.id}</div>
                 </Link>
               ))
