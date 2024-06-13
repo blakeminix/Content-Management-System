@@ -41,6 +41,7 @@ export default async function Page() {
       </div>
 
       <main className="flex flex-col items-center pt-24">
+      <div className="max-w-4xl mx-auto bg-gray-800 p-6 rounded-lg shadow-md">
         <form
           className="flex flex-col items-center"
           action={async () => {
@@ -56,6 +57,7 @@ export default async function Page() {
             Delete Account
           </button>
         </form>
+        </div>
       </main>
 
     </div>
