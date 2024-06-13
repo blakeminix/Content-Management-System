@@ -6,9 +6,14 @@ import { useRouter } from "next/navigation";
 export function Login() {
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = async (formData) => {
+    const handleLogin = async (event) => {
+        event.preventDefault();
         setErrorMessage('');
+        setLoading(true);
+
+        const formData = new FormData(event.target);
         const username = formData.get('username');
         const password = formData.get('password');
 
@@ -30,6 +35,7 @@ export function Login() {
           if (data.response == 1) {
             router.push('/dashboard');
           } else {
+            setLoading(false);
             setErrorMessage('Invalid username or password');
           }
         } catch (error) {
@@ -45,18 +51,16 @@ export function Login() {
         <section className='min-h-screen h-full flex justify-center'>
         <div className='p-8 rounded-lg max-w-sm md:max-w-md lg:max-w-md w-full mt-4 sm:mt-8 lg:mt-12'>
           <h1 className='text-xl md:text-2xl lg:text-2xl font-bold mb-12 lg:mb-16 text-center'>Content Management System</h1>
-          <form
-            action={async (formData) => {
-              await handleLogin(formData);
-            }}
-          >
+          <form onSubmit={handleLogin}>
             <label htmlFor="username" className="block text-sm font-medium text-white mb-3">Username</label>
-            <input className="p-4 w-full border rounded-lg mb-6" type="text" name="username" id="username" placeholder="Username" autoComplete="username" autoCapitalize="off"/>
+            <input className="p-4 w-full border rounded-lg mb-6" type="text" name="username" id="username" placeholder="Username" autoComplete="username" autoCapitalize="off" required/>
   
             <label htmlFor="password" className="block text-sm font-medium text-white mb-3">Password</label>
-            <input className="p-4 w-full border rounded-lg mb-10" type="password" name="password" id="password" placeholder="Password" autoComplete="current-password" autoCapitalize="off"/>
+            <input className="p-4 w-full border rounded-lg mb-10" type="password" name="password" id="password" placeholder="Password" autoComplete="current-password" autoCapitalize="off" required/>
   
-            <button className="h-12 w-full bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors mb-3" type="submit">Login</button>
+            <button className="h-12 w-full bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition-colors mb-3" type="submit">
+              {loading ? 'Logging in...' : 'Login'}
+            </button>
           </form>
 
           {errorMessage && <p className="text-red-500 text-center mb-4">{errorMessage}</p>}
