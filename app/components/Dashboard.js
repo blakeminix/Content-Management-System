@@ -30,6 +30,7 @@ export function Dashboard() {
       
           const data = await response.json();
           const groups = data.groups;
+          console.log(data);
           setGroups(groups);
         } catch (error) {
           console.error('Get groups failed:', error);
@@ -50,7 +51,7 @@ export function Dashboard() {
               groups.map(group => (
                 <Link className="block p-6 bg-gray-800 rounded-lg shadow-md hover:bg-gray-700 transition-colors duration-300" key={group.id} href={`/groups/${group.id}`}>
                   <div className='text-base lg:text-lg font-semibold text-white mb-2'>{group.group_name}</div>
-                  <div className='text-sm text-gray-400'>#{group.id}</div>
+                  <div className='text-sm text-gray-400'>{group.id}</div>
                 </Link>
               ))
             ) : (
