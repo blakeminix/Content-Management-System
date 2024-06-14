@@ -71,10 +71,9 @@ export function Users() {
         await fetchUsers();
         await fetchRequests();
         setIsMember(true);
+        setLoading(false);
       } catch (error) {
         console.error('Error checking group or membership:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -91,7 +90,7 @@ export function Users() {
         });
     
         if (!response.ok) {
-          throw new Error('Get posts failed');
+          throw new Error('Get privacy failed');
         }
 
         const data = await response.json();
@@ -146,14 +145,14 @@ export function Users() {
       });
   
       if (!response.ok) {
-        throw new Error('Get users failed');
+        throw new Error('Get requests failed');
       }
   
       const data = await response.json();
       console.log(data.requests);
       setRequests(data.requests || []);
     } catch (error) {
-      console.error('Get users failed:', error);
+      console.error('Get requests failed:', error);
     }
   };
 
@@ -170,14 +169,14 @@ export function Users() {
       });
   
       if (!response.ok) {
-        throw new Error('Get users failed');
+        throw new Error('Accept request failed');
       }
   
       const data = await response.json();
       fetchRequests();
       fetchUsers();
     } catch (error) {
-      console.error('Get users failed:', error);
+      console.error('Accept request failed:', error);
     }
   };
   
@@ -194,13 +193,13 @@ export function Users() {
       });
   
       if (!response.ok) {
-        throw new Error('Get users failed');
+        throw new Error('Mod failed');
       }
   
       const data = await response.json();
       fetchUsers();
     } catch (error) {
-      console.error('Get users failed:', error);
+      console.error('Mod failed:', error);
     }
   };
 
@@ -217,13 +216,13 @@ export function Users() {
       });
   
       if (!response.ok) {
-        throw new Error('Get users failed');
+        throw new Error('Remove mod failed');
       }
   
       const data = await response.json();
       fetchUsers();
     } catch (error) {
-      console.error('Get users failed:', error);
+      console.error('Remove mod failed:', error);
     }
   };
 
@@ -241,13 +240,13 @@ export function Users() {
       });
   
       if (!response.ok) {
-        throw new Error('Get users failed');
+        throw new Error('Kick user failed');
       }
   
       const data = await response.json();
       fetchUsers();
     } catch (error) {
-      console.error('Get users failed:', error);
+      console.error('Kick user failed:', error);
     }
   };
 
@@ -280,7 +279,7 @@ export function Users() {
     {isMember && (
     <>
     <div className="mb-8 mt-6 lg:mt-20">
-      <div className="mb-4 text-lg font-semibold">Users: {users.length}</div>
+      <div className="mb-4 text-lg font-semibold text-white">Users: {users.length}</div>
       {users && users.length > 0 ? (
         users.map(user => (
           <div className="mb-2 flex items-right justify-between bg-gray-800 p-3 rounded" key={user}>
@@ -303,7 +302,7 @@ export function Users() {
 
     {privacy && isModerator && (
     <div className="mb-8 mt-16">
-      <div className="mb-4 text-lg font-semibold">Requests: {requests.length}</div>
+      <div className="mb-4 text-lg font-semibold text-white">Requests: {requests.length}</div>
       {requests && requests.length > 0 ? (
         requests.map(user => (
           <div className="mb-2 flex items-right justify-between bg-gray-800 p-3 rounded" key={user}>

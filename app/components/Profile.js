@@ -146,7 +146,7 @@ export function Profile() {
               await addProfileDescription(formData);
             }}
           >
-            <textarea className="w-full p-4 border border-gray-300 rounded-md focus:ring focus:ring-blue-500 focus:outline-none" type="post" name="description" placeholder="Description" autoComplete="off" rows={5} maxLength={100000} value={description} onChange={(e) => setDescription(e.target.value)}/>
+            <textarea className="w-full p-4 border border-gray-300 rounded-md focus:ring focus:ring-blue-500 focus:outline-none bg-gray-950 text-white" type="post" name="description" placeholder="Description" autoComplete="off" rows={5} maxLength={100000} value={description} onChange={(e) => setDescription(e.target.value)}/>
             <button className="w-full bg-blue-700 text-white font-semibold py-2 rounded-md hover:bg-blue-600 transition-colors duration-300" type="submit">Upload Description</button>
           </form>
           </div>

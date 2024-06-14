@@ -1,12 +1,8 @@
 import Link from 'next/link'
-import { logout, getSession, deleteGroup } from '../../../../lib'
+import { getSession } from '../../../../lib'
 import { redirect } from 'next/navigation';
 import { ProfileDropdown } from '@/app/components/ProfileDropdown';
-import { headers } from "next/headers";
-import { DeleteGroup } from '@/app/components/DeleteGroupButton';
-import { SideBar } from '@/app/components/SideBar';
 import { Users } from '@/app/components/Users';
-import { CheckGroup } from '@/app/components/CheckGroup';
 
 export const metadata = {
   title: "Users | CMS",

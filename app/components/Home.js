@@ -140,7 +140,7 @@ export function Home() {
       </div>
     );
   }
-  
+
   return (
     <div className="flex flex-col lg:flex-row mx-auto w-full max-w-screen-lg lg:px-0 min-h-screen">
       <aside className="mx-auto w-full lg:w-[calc(20%-1rem)] bg-gray-800 text-white p-4 pt-20 space-y-1 lg:space-y-4 relative lg:fixed left-0 h-80 lg:h-full">
@@ -160,7 +160,7 @@ export function Home() {
               await handleDescription(formData);
             }}>
               <textarea
-                className="w-full p-4 border border-gray-300 rounded-md focus:ring focus:ring-blue-500 focus:outline-none"
+                className="w-full p-4 border border-gray-300 rounded-md focus:ring focus:ring-blue-500 focus:outline-none bg-gray-950 text-white"
                 name="description"
                 placeholder="Description"
                 autoComplete="off"
@@ -177,7 +177,7 @@ export function Home() {
               </button>
             </form>
           ) : isMember ? (
-            <div className="max-w-none" dangerouslySetInnerHTML={createMarkup(description)} />
+            <div className="max-w-none text-white" dangerouslySetInnerHTML={createMarkup(description)} />
           ) : (
             <p></p>
           )}
