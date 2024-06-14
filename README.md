@@ -1,4 +1,9 @@
+# Content Management System
+
 ![Login](https://github.com/blakeminix/blakeminix.com/blob/main/public/login.PNG)
+
+![Dashboard](https://github.com/blakeminix/blakeminix.com/blob/main/public/dashboard.PNG)
+
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
