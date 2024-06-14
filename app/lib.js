@@ -323,7 +323,7 @@ export async function getIsRequested(gid) {
   }
 }
 
-export async function joinGroup(groupID) {
+export async function joinGroup(gid) {
   const connection = await pool.getConnection();
   try {
     const session = cookies().get("session")?.value;
@@ -331,8 +331,6 @@ export async function joinGroup(groupID) {
 
     const parsed = await decrypt(session);
     const username = parsed.user.username;
-
-    const gid = parseInt(groupID, 10);
 
     let userGroups = [];
     const [userRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
@@ -347,8 +345,7 @@ export async function joinGroup(groupID) {
     let userG = [];
     if (userGroups && userGroups.length > 0) {
       for (const groupID of userGroups) {
-        const id = parseInt(groupID, 10);
-        userG.push(id);
+        userG.push(groupID);
       }
     }
     userG.push(gid);
@@ -372,7 +369,7 @@ export async function joinGroup(groupID) {
   }
 }
 
-export async function leaveGroup(groupID) {
+export async function leaveGroup(gid) {
   const connection = await pool.getConnection();
   try {
     const session = cookies().get("session")?.value;
@@ -380,8 +377,6 @@ export async function leaveGroup(groupID) {
 
     const parsed = await decrypt(session);
     const username = parsed.user.username;
-
-    const gid = parseInt(groupID, 10);
 
     let userGroups = [];
     const [userRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
@@ -396,8 +391,7 @@ export async function leaveGroup(groupID) {
     let userG = [];
     if (userGroups && userGroups.length > 0) {
       for (const groupID of userGroups) {
-        const id = parseInt(groupID, 10);
-        userG.push(id);
+        userG.push(groupID);
       }
     }
     userG = userG.filter(group => group !== gid);
@@ -753,11 +747,9 @@ export async function getRequests(gid) {
   }
 }
 
-export async function acceptRequest(groupID, accept, user) {
+export async function acceptRequest(gid, accept, user) {
   const connection = await pool.getConnection();
   try {
-    const gid = parseInt(groupID, 10);
-
     let requests = [];
     const [reqRow] = await connection.query('SELECT requests FROM `groups` WHERE id = ?', [gid]);
     if (reqRow[0].requests) {
@@ -791,8 +783,7 @@ export async function acceptRequest(groupID, accept, user) {
     let userG = [];
     if (userGroups && userGroups.length > 0) {
       for (const groupID of userGroups) {
-        const id = parseInt(groupID, 10);
-        userG.push(id);
+        userG.push(groupID);
       }
     }
 
@@ -853,11 +844,9 @@ export async function removeMod(gid, user) {
   }
 }
 
-export async function kickUser(groupID, user) {
+export async function kickUser(gid, user) {
   const connection = await pool.getConnection();
   try {
-    const gid = parseInt(groupID, 10);
-
     let users = [];
     const [userRow] = await connection.query('SELECT users_in_group FROM `groups` WHERE id = ?', [gid]);
     if (userRow[0].users_in_group) {
@@ -891,8 +880,7 @@ export async function kickUser(groupID, user) {
     let userG = [];
     if (userGroups && userGroups.length > 0) {
       for (const groupID of userGroups) {
-        const id = parseInt(groupID, 10);
-        userG.push(id);
+        userG.push(groupID);
       }
     }
 
@@ -932,11 +920,10 @@ export async function createGroup(formData) {
     }
     const uniqueid = v4();
 
-    await connection.query('INSERT INTO `groups` (group_name, users_in_group, moderators, owner_username, is_request_to_join, is_public, uuid) VALUES (?, ?, ?, ?, ?, ?, ?)', [group_name, JSON.stringify(users), JSON.stringify(users), username, is_request_to_join, is_public, uniqueid]);
+    await connection.query('INSERT INTO `groups` (group_name, users_in_group, moderators, owner_username, is_request_to_join, is_public, id) VALUES (?, ?, ?, ?, ?, ?, ?)', [group_name, JSON.stringify(users), JSON.stringify(users), username, is_request_to_join, is_public, uniqueid]);
 
-    const [row] = await connection.query('SELECT id FROM `groups` WHERE uuid = ?', [uniqueid]);
+    const [row] = await connection.query('SELECT id FROM `groups` WHERE id = ?', [uniqueid]);
     const storedID = row[0]?.id;
-    const storedIDInt = parseInt(storedID, 10);
 
     let userGroups = [];
     const [userRow] = await connection.query('SELECT `groups` FROM users WHERE username = ?', [username]);
@@ -951,12 +938,11 @@ export async function createGroup(formData) {
     let userG = [];
     if (userGroups && userGroups.length > 0) {
       for (const groupID of userGroups) {
-        const id = parseInt(groupID, 10);
-        userG.push(id);
+        userG.push(groupID);
       }
     }
 
-    userG.push(storedIDInt);
+    userG.push(storedID);
     await connection.query('UPDATE users SET `groups` = ? WHERE username = ?', [JSON.stringify(userG), username]);
 
     return storedID;
@@ -992,8 +978,7 @@ export async function deleteGroup(gid) {
       let userG = [];
       if (userGroups && userGroups.length > 0) {
         for (const groupID of userGroups) {
-          const id = parseInt(groupID, 10);
-          userG.push(id);
+          userG.push(groupID);
         }
       }
       
@@ -1035,8 +1020,7 @@ export async function getUserGroups() {
     let userG = [];
     if (groups && groups.length > 0) {
       for (const groupID of groups) {
-        const id = parseInt(groupID, 10);
-        userG.push(id);
+        userG.push(groupID);
       }
     }
 
@@ -1095,8 +1079,7 @@ export async function getProfileGroups(username) {
     let userG = [];
     if (groups && groups.length > 0) {
       for (const groupID of groups) {
-        const id = parseInt(groupID, 10);
-        userG.push(id);
+        userG.push(groupID);
       }
     }
 
