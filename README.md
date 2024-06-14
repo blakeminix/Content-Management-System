@@ -1,6 +1,16 @@
 # Content Management System
 
+Welcome to my [Content Management System](https://content-management-system-32ddcdcefaf8.herokuapp.com/)!
+
+This project was built with Next.js, React, JavaScript, Tailwind CSS, and a MySQL database hosted through JawsDB. It was deployed on Heroku. JWT is used for session cookie encryption and bcrypt is used for secure password hashing. 
+
+This project contains implemented authorization, profiles for users, groups where users can share/store posts and media, and other pages that support the profile and group functionality such as the join group, create group, and page not found pages. 
+
+## Login
+
 ![Login](https://github.com/blakeminix/blakeminix.com/blob/main/public/login.PNG)
+
+## Dashboard
 
 ![Dashboard](https://github.com/blakeminix/blakeminix.com/blob/main/public/dashboard.PNG)
 
