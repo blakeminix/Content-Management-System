@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useRef } from "react";
-import '../globals.css'
 import { useRouter } from "next/navigation";
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -16,6 +15,8 @@ export function Media() {
   const [isMember, setIsMember] = useState(false);
   const [isModerator, setIsModerator] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const parts = pathname.split('/');
+  const gid = parts[2];
 
   useEffect(() => {
     const getGroupAndCheckMembership = async () => {
@@ -69,10 +70,9 @@ export function Media() {
 
         await fetchMedia(gid);
         setIsMember(true);
+        setLoading(false);
       } catch (error) {
         console.error('Error checking group or membership:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -162,6 +162,7 @@ export function Media() {
         }
         fetchMedia();
         setMediaContent("");
+        fileInput.value = "";
       } catch (error) {
         console.error('Media upload failed:', error);
       }
@@ -192,46 +193,80 @@ export function Media() {
   }
 
   if (loading) {
-    return <div></div>;
+    return (
+      <div>
+        <aside className="mx-auto w-full lg:w-[calc(20%-1rem)] bg-gray-800 text-white p-4 pt-20 space-y-1 lg:space-y-4 relative lg:fixed left-0 h-80 lg:h-full">
+          <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}`}>Home</Link>
+          <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}/posts`}>Posts</Link>
+          <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}/media`}>Media</Link>
+          <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}/users`}>Users</Link>
+          <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}/settings`}>Settings</Link>
+        </aside>
+        <div className="flex justify-center items-center h-screen"><div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"></div></div>
+      </div>
+    );
   }
 
   return (
-    <div className="post-container">
+    <div className="flex flex-col lg:flex-row mx-auto w-full max-w-screen-lg lg:px-0 min-h-screen">
+      <aside className="mx-auto w-full lg:w-[calc(20%-1rem)] bg-gray-800 text-white p-4 pt-20 space-y-1 lg:space-y-4 relative lg:fixed left-0 h-80 lg:h-full">
+        <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}`}>Home</Link>
+        <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}/posts`}>Posts</Link>
+        <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}/media`}>Media</Link>
+        <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}/users`}>Users</Link>
+        <Link className="block px-4 py-2 rounded hover:bg-gray-700 transition-colors" href={`/groups/${gid}/settings`}>Settings</Link>
+      </aside>
+
+    <div className="flex-grow p-4 lg:ml-[20%]">
     {isMember && (
-      <><div ref={postListRef} className='post-list'>
+      <><div ref={postListRef} className='mb-8 mt-6 lg:mt-20'>
           {media && media.length > 0 ? (
             media.map(post => (
-              <div className="post" key={post.id}>
-                <Link href={`/users/${post.username}`} className="post-username">{post.username}</Link>
-                <div className="media-container">
+              <div className="mb-2 bg-gray-800 p-6 rounded" key={post.id}>
+                <div className="flex items-center justify-between mb-4">
+                  <Link href={`/users/${post.username}`} className="text-blue-400 hover:underline">{post.username}</Link>
+                  {(isOwner || (isModerator && !post.isModerator) || post.isMe) && (
+                    <button onClick={() => deleteMedia(post.id)} className="px-2 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-500">Delete</button>
+                  )}
+                </div>
+                <div className="flex justify-center items-center">
                   {post.mime_type.startsWith('image/') ? (
-                    <img src={`data:${post.mime_type};base64,${post.file_data}`} alt={post.filename} />
+                    <img className="max-w-full max-h-500 object-contain" src={`data:${post.mime_type};base64,${post.file_data}`} alt={post.filename} />
                   ) : post.mime_type.startsWith('video/') ? (
-                    <video controls>
+                    <video className="max-w-full max-h-500" controls>
                       <source src={`data:${post.mime_type};base64,${post.file_data}`} type={post.mime_type} />
-                      
                     </video>
                   ) : null}
                 </div>
-                <br />
-                {(isOwner || (isModerator && !post.isModerator) || post.isMe) && (
-                  <button onClick={() => deleteMedia(post.id)} className="delete-button">Delete</button>
-                )}
               </div>
             ))
           ) : (
             <p></p>
           )}
-        </div><form
-          onSubmit={handleMediaUpload}
-        >
-            <div className="post-box-container">
-              <input type="file" id="mediaInput" accept="image/*, video/*" />
-              <br />
-              <button className="post-button" type="submit">Upload</button>
+        </div>
+        <div className="max-w-4xl mx-auto bg-gray-800 p-6 rounded-lg shadow-md mb-8">
+          <form
+            className="space-y-4"
+            onSubmit={handleMediaUpload}
+          >
+            <div className="flex items-center space-x-4">
+              <input
+                className="hidden"
+                type="file"
+                id="mediaInput"
+                accept="image/*, video/*"
+                onChange={(e) => setMediaContent(e.target.files[0]?.name || "")}
+              />
+              <label htmlFor="mediaInput" className="cursor-pointer bg-blue-700 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 transition-colors duration-300">
+                Choose File
+              </label>
+              <span className="text-white">{mediaContent}</span>
             </div>
-          </form></>
+            <button className="w-full bg-blue-700 text-white font-semibold py-2 rounded-md hover:bg-blue-600 transition-colors duration-300" type="submit">Upload</button>
+          </form>
+        </div></>
     )}
+    </div>
     </div>
   );
 }
