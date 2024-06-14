@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { getSession } from '../../../../lib'
 import { redirect } from 'next/navigation';
 import { ProfileDropdown } from '@/app/components/ProfileDropdown';
-import { SideBar } from '@/app/components/SideBar';
 import { Posts } from '@/app/components/Posts';
 
 export const metadata = {
