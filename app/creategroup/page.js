@@ -41,7 +41,7 @@ export default async function Page() {
       <main className="py-24">
         <div className="container mx-auto px-4">
           <section className="max-w-md mx-auto bg-gray-800 rounded-lg shadow-md p-10">
-            <h1 className="text-2xl font-bold mb-6 text-center">Create Group</h1>
+            <h1 className="text-2xl font-bold mb-6 text-center text-white">Create Group</h1>
             <form
               action={async (formData) => {
               "use server";
@@ -52,7 +52,7 @@ export default async function Page() {
                 <input
                   type="text"
                   name="group_name"
-                  className="p-4 w-full border rounded-lg mb-6 text-white"
+                  className="p-4 w-full border rounded-lg mb-6 text-white bg-gray-950"
                   placeholder="Group Name"
                   maxLength={24}
                   autoComplete="off"
@@ -71,7 +71,7 @@ export default async function Page() {
                     defaultChecked
                     className="mr-2"
                   />
-                  <label htmlFor="public" className="mr-6">Public</label>
+                  <label htmlFor="public" className="mr-6 text-white">Public</label>
 
                   <input
                     type="radio"
@@ -80,7 +80,7 @@ export default async function Page() {
                     value="request"
                     className="mr-2"
                   />
-                  <label htmlFor="request">Private</label>
+                  <label htmlFor="request" className='text-white'>Private</label>
                 </div>
               </div>
 

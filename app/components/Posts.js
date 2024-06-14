@@ -210,7 +210,7 @@ export function Posts() {
                   await handlePost(formData);
                 } }
               >
-                <textarea className="w-full p-4 border border-gray-300 rounded-md focus:ring focus:ring-blue-500 focus:outline-none" type="post" name="post" placeholder="Post" autoComplete="off" rows={3} maxLength={10000} value={postContent} onChange={(e) => setPostContent(e.target.value)} />
+                <textarea className="w-full p-4 border border-gray-300 rounded-md focus:ring focus:ring-blue-500 focus:outline-none bg-gray-950 text-white" type="post" name="post" placeholder="Post" autoComplete="off" rows={3} maxLength={10000} value={postContent} onChange={(e) => setPostContent(e.target.value)} />
                 <button className="w-full bg-blue-700 text-white font-semibold py-2 rounded-md hover:bg-blue-600 transition-colors duration-300" type="submit">Post</button>
               </form>
             </div></>

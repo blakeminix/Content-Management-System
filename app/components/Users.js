@@ -279,7 +279,7 @@ export function Users() {
     {isMember && (
     <>
     <div className="mb-8 mt-6 lg:mt-20">
-      <div className="mb-4 text-lg font-semibold">Users: {users.length}</div>
+      <div className="mb-4 text-lg font-semibold text-white">Users: {users.length}</div>
       {users && users.length > 0 ? (
         users.map(user => (
           <div className="mb-2 flex items-right justify-between bg-gray-800 p-3 rounded" key={user}>
@@ -302,7 +302,7 @@ export function Users() {
 
     {privacy && isModerator && (
     <div className="mb-8 mt-16">
-      <div className="mb-4 text-lg font-semibold">Requests: {requests.length}</div>
+      <div className="mb-4 text-lg font-semibold text-white">Requests: {requests.length}</div>
       {requests && requests.length > 0 ? (
         requests.map(user => (
           <div className="mb-2 flex items-right justify-between bg-gray-800 p-3 rounded" key={user}>
