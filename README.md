@@ -18,6 +18,9 @@ This project contains implemented authorization, profiles for users, groups wher
 
 ![Profile](https://github.com/blakeminix/blakeminix.com/blob/main/public/profile.PNG)
 
+## Group
+![Group](https://github.com/blakeminix/blakeminix.com/blob/main/public/group.PNG)
+
 ## Group Media
 ![Media](https://github.com/blakeminix/blakeminix.com/blob/main/public/media.PNG)
 
