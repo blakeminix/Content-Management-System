@@ -47,7 +47,6 @@ export function Profile() {
         } catch (error) {
           console.error('Error checking user:', error);
         } finally {
-            setUsername(user);
             setLoading(false);
         }
       };

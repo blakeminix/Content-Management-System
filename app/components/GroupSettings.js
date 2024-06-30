@@ -60,10 +60,6 @@ export function GroupSettings() {
           setIsOwner(true);
         }
 
-        if (membershipData.isModerator) {
-          setIsModerator(true);
-        }
-
         setIsMember(true);
         setLoading(false);
       } catch (error) {

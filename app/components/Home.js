@@ -61,10 +61,6 @@ export function Home() {
           setIsOwner(true);
         }
 
-        if (membershipData.isModerator) {
-          setIsModerator(true);
-        }
-
         await fetchDescription(gid);
         setIsMember(true);
         setLoading(false);
