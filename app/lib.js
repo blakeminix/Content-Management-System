@@ -1,7 +1,6 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
-import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 import { v4 } from "uuid";
 
 const mysql = require('mysql2/promise');
