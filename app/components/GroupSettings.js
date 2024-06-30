@@ -10,7 +10,6 @@ export function GroupSettings() {
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [isMember, setIsMember] = useState(false);
-  const [isModerator, setIsModerator] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const parts = pathname.split('/');
   const gid = parts[2];
@@ -30,7 +29,7 @@ export function GroupSettings() {
         });
 
         if (!groupResponse.ok) {
-          throw new Error('Get group failed');
+          throw new Error('Check group failed');
         }
 
         const groupData = await groupResponse.json();
@@ -48,7 +47,7 @@ export function GroupSettings() {
         });
 
         if (!membershipResponse.ok) {
-          throw new Error('Get membership failed');
+          throw new Error('Check membership failed');
         }
 
         const membershipData = await membershipResponse.json();

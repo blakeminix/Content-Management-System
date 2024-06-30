@@ -1,7 +1,7 @@
 import { addDescription } from "@/app/lib";
 import { NextResponse } from "next/server";
 
-export async function POST(req, res) {
+export async function POST(req) {
   try {
     const message = await req.json();
     const {

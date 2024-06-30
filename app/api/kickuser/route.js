@@ -1,7 +1,7 @@
 import { kickUser } from "@/app/lib";
 import { NextResponse } from "next/server";
 
-export async function POST(req, res) {
+export async function POST(req) {
   try {
     const message = await req.json();
     const {
@@ -9,9 +9,9 @@ export async function POST(req, res) {
       user
     } = message;
     await kickUser(gid, user);
-    return NextResponse.json({ message: 'Post stored successfully' });
+    return NextResponse.json({ message: 'Kicked user successfully' });
   } catch (error) {
-    console.error('Logout failed:', error);
-    return NextResponse.json({ message: 'Post store failed' });
+    console.error('Kick user failed:', error);
+    return NextResponse.json({ message: 'Kick user failed' });
   }
 }

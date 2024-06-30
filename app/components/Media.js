@@ -33,7 +33,7 @@ export function Media() {
         });
 
         if (!groupResponse.ok) {
-          throw new Error('Get group failed');
+          throw new Error('Check group failed');
         }
 
         const groupData = await groupResponse.json();
@@ -51,7 +51,7 @@ export function Media() {
         });
 
         if (!membershipResponse.ok) {
-          throw new Error('Get membership failed');
+          throw new Error('Check membership failed');
         }
 
         const membershipData = await membershipResponse.json();
@@ -183,11 +183,11 @@ export function Media() {
       });
 
       if (!response.ok) {
-        throw new Error('Logout failed');
+        throw new Error('Delete media failed');
       }
       fetchMedia();
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error('Delete media failed:', error);
     }
     router.refresh();
   }

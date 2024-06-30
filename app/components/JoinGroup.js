@@ -27,7 +27,7 @@ export function JoinGroup() {
           });
   
           if (!groupResponse.ok) {
-            throw new Error('Get group failed');
+            throw new Error('Check group failed');
           }
   
           const groupData = await groupResponse.json();
@@ -45,7 +45,7 @@ export function JoinGroup() {
           });
   
           if (!membershipResponse.ok) {
-            throw new Error('Get membership failed');
+            throw new Error('Check membership failed');
           }
   
           const membershipData = await membershipResponse.json();

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getMedia } from "@/app/lib";
 
-export async function POST(req, res) {
+export async function POST(req) {
   try {
     const { gid } = await req.json();
     const media = await getMedia(gid);

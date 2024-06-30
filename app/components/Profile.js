@@ -10,7 +10,6 @@ export function Profile() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [loading2, setLoading2] = useState(true);
-    const [username, setUsername] = useState('');
     const [groups, setGroups] = useState([]);
     const [description, setDescription] = useState("");
     const [isMe, setIsMe] = useState(false);

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getProfileDescription } from "@/app/lib";
 
-export async function POST(req, res) {
+export async function POST(req) {
   try {
     const { user } = await req.json();
     let description = await getProfileDescription(user);
@@ -10,7 +10,7 @@ export async function POST(req, res) {
     }
     return NextResponse.json({ description });
   } catch (error) {
-    console.error('Description failed:', error);
-    return NextResponse.json({ message: 'Description failed' });
+    console.error('Get description failed:', error);
+    return NextResponse.json({ message: 'Get description failed' });
   }
 }

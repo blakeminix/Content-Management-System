@@ -18,7 +18,7 @@ export async function LeaveGroup() {
           });
       
           if (!response.ok) {
-            throw new Error('Get posts failed');
+            throw new Error('Leave group failed');
           }
 
           const data = await response.json();

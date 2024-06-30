@@ -1,7 +1,7 @@
 import { handleMod } from "@/app/lib";
 import { NextResponse } from "next/server";
 
-export async function POST(req, res) {
+export async function POST(req) {
   try {
     const { gid, user } = await req.json();
     await handleMod(gid, user);

@@ -1,7 +1,7 @@
 import { acceptRequest } from "@/app/lib";
 import { NextResponse } from "next/server";
 
-export async function POST(req, res) {
+export async function POST(req) {
   try {
     const message = await req.json();
     const {
@@ -10,9 +10,9 @@ export async function POST(req, res) {
       user
     } = message;
     await acceptRequest(gid, accept, user);
-    return NextResponse.json({ message: 'Post stored successfully' });
+    return NextResponse.json({ message: 'Request accepted successfully' });
   } catch (error) {
     console.error('Logout failed:', error);
-    return NextResponse.json({ message: 'Post store failed' });
+    return NextResponse.json({ message: 'Request failed' });
   }
 }
